@@ -99,14 +99,14 @@ export default {
         return;
       }
       if (doNext && endSecs > startSecs) {
-        if (vttText.value.match("^\\d{9}(?:|, \\d{9})+$")) {
+        if (vttText.value.match("^\\d{9}(?:|,?(| )\\d{9})*$")) {
           const productArray = vttText.value.split(",");
           vttError.value = null;
           pushCue({startTime: startSecs, endTime: endSecs, text: productArray});
         } else {
           textRef.setCustomValidity("value is not a valid set of product ids");
           textRef.reportValidity();
-          vttError.value = "Input is not a list of products";
+          vttError.value = "Input is not a list of products, make sure that you type in a list of pc9s separated by commas";
         }
       }
       console.log("STATE :: ", state);
@@ -145,15 +145,16 @@ export default {
     .error {
       display: none;
       &.on {
-        display: block;
         background: #ff8686;
         font-weight: 800;
         border-radius: 6px;
         color: #f7f7f7;
-        line-height: 30px;
+        line-height: 16px;
         width: 100%;
         font-size: 14px;
         margin: 0 10px 15px;
+        padding: 10px;
+        text-align: left;
       }
     }
     button {
