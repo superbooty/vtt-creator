@@ -194,6 +194,9 @@ export default {
     .meta-text {
       width: 340px;
       margin: 0;
+      label {
+        left: 20px;
+      }
       textarea {
         width: 310px;
         height: 80px;
