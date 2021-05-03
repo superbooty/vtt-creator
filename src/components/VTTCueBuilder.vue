@@ -32,8 +32,8 @@
       <textarea
         class="msg txt-input"
         v-model="vttText"
-        ref="endInput"
-        :pattern="inputPattern"
+        ref="vttTextRef"
+        :pattern="textAreaPattern"
         required
         placeholder="Enter VTT Text"
         @input="inputHandler"
@@ -58,12 +58,14 @@ export default {
     const { state, pushCue } = appState();
 
     const vttStart = ref("");
-    const vttStartRef = ref(null);
+    const vttStartRef= ref(null);
     const vttEndRef = ref(null);
+    const vttTextRef = ref(null);
     const vttEnd = ref("");
     const vttText = ref("");
     const vttError = ref(null);
     const inputPattern = ref("(?:[01]\\d|2[0123]):(?:[012345]\\d):(?:[012345]\\d)");
+    const textAreaPattern = ref("^\\d{9}(?:|, \\d{9})+$");
 
     // methods
     const inputHandler = (e) => {
@@ -75,38 +77,34 @@ export default {
       console.log("Building the VTT");
       const start = vttStartRef.value;
       const end = vttEndRef.value;
+      const textRef = vttTextRef.value;
       let startSecs = 0;
       let endSecs = 0;
       // .split(':').reduce((acc,time) => (60 * acc) + +time);
       let doNext = true;
-        start.setCustomValidity("");
-      if (start.checkValidity())  {
+      if (start.reportValidity())  {
         startSecs = vttStart.value.split(':').reduce((acc,time) => (60 * acc) + +time);
         console.log("Input is Valid...");
       } else {
-        doNext = false;
         start.setCustomValidity("value does not match pattern hh:mm:ss");
+        doNext = false;
         start.reportValidity();
       }
-      if (doNext && end.checkValidity())  {
+      if (doNext && end.reportValidity())  {
         endSecs = vttEnd.value.split(':').reduce((acc,time) => (60 * acc) + +time);
         console.log("Input is Valid...");
       } else {
-        doNext = false;
         end.setCustomValidity("value does not match pattern hh:mm:ss");
-        end.reportValidity();
+        doNext = false;
       }
       if (doNext && endSecs > startSecs) {
-        try {
-          const vttTextVal = JSON.parse(vttText.value);
-          if (Array.isArray(vttTextVal)) {
-            vttError.value = null;
-            pushCue({startTime: startSecs, endTime: endSecs, text: vttTextVal});
-          } else {
-            vttError.value = "Input is not an Array of Item Ids";
-          }
-        } catch {
-          vttError.value = "Text is not JSON";
+        if (textRef.reportValidity()) {
+          const productArray = vttText.value.split(",");
+          vttError.value = null;
+          pushCue({startTime: startSecs, endTime: endSecs, text: productArray});
+        } else {
+          textRef.setCustomValidity("value is not a valid set of product ids");
+          vttError.value = "Input is not a list of products";
         }
       }
       console.log("STATE :: ", state);
@@ -118,10 +116,12 @@ export default {
       vttText,
       vttStartRef,
       vttEndRef,
+      vttTextRef,
       inputHandler,
       buildVTT,
       inputPattern,
-      vttError
+      vttError,
+      textAreaPattern
     };
   },
 
