@@ -26,6 +26,7 @@
         @input="inputHandler"
       />
     </div>
+    <div class="error" :class="{'on': vttError !== null}">{{vttError}}</div>
     <div class="meta-text">
       <label >text</label>
       <textarea
@@ -61,6 +62,7 @@ export default {
     const vttEndRef = ref(null);
     const vttEnd = ref("");
     const vttText = ref("");
+    const vttError = ref(null);
     const inputPattern = ref("(?:[01]\\d|2[0123]):(?:[012345]\\d):(?:[012345]\\d)");
 
     // methods
@@ -95,9 +97,17 @@ export default {
         end.reportValidity();
       }
       if (doNext && endSecs > startSecs) {
-        const vttTextVal = JSON.parse(vttText.value);
-        console.log("Is Array :: ", Array.isArray(vttTextVal));
-        pushCue({startTime: startSecs, endTime: endSecs, text: null});
+        try {
+          const vttTextVal = JSON.parse(vttText.value);
+          if (Array.isArray(vttTextVal)) {
+            vttError.value = null;
+            pushCue({startTime: startSecs, endTime: endSecs, text: vttTextVal});
+          } else {
+            vttError.value = "Input is not an Array of Item Ids";
+          }
+        } catch {
+          vttError.value = "Text is not JSON";
+        }
       }
       console.log("STATE :: ", state);
     }
@@ -110,7 +120,8 @@ export default {
       vttEndRef,
       inputHandler,
       buildVTT,
-      inputPattern
+      inputPattern,
+      vttError
     };
   },
 
@@ -130,6 +141,20 @@ export default {
     flex-wrap: wrap;
     justify-content: space-evenly;
     width: 340px;
+    .error {
+      display: none;
+      &.on {
+        display: block;
+        background: #ff8686;
+        font-weight: 800;
+        border-radius: 6px;
+        color: #f7f7f7;
+        line-height: 30px;
+        width: 100%;
+        font-size: 14px;
+        margin: 0 10px 15px;
+      }
+    }
     button {
       width: 100%;
       margin: 5px;
@@ -170,10 +195,10 @@ export default {
       width: 340px;
       margin: 0;
       textarea {
-        width: 320px;
+        width: 310px;
         height: 80px;
         resize: none;
-        text-indent: 5px;
+        padding: 10px 5px;
         border: 1px solid darkgray;
         border-radius: 6px;
         outline: none;
