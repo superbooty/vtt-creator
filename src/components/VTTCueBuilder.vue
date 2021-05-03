@@ -33,7 +33,6 @@
         class="msg txt-input"
         v-model="vttText"
         ref="vttTextRef"
-        :pattern="textAreaPattern"
         required
         placeholder="Enter VTT Text"
         @input="inputHandler"
@@ -65,7 +64,6 @@ export default {
     const vttText = ref("");
     const vttError = ref(null);
     const inputPattern = ref("(?:[01]\\d|2[0123]):(?:[012345]\\d):(?:[012345]\\d)");
-    const textAreaPattern = ref("^\\d{9}(?:|, \\d{9})+$");
 
     // methods
     const inputHandler = (e) => {
@@ -82,28 +80,32 @@ export default {
       let endSecs = 0;
       // .split(':').reduce((acc,time) => (60 * acc) + +time);
       let doNext = true;
-      if (start.reportValidity())  {
+      if (start.checkValidity())  {
         startSecs = vttStart.value.split(':').reduce((acc,time) => (60 * acc) + +time);
         console.log("Input is Valid...");
       } else {
         start.setCustomValidity("value does not match pattern hh:mm:ss");
         doNext = false;
         start.reportValidity();
+        return;
       }
-      if (doNext && end.reportValidity())  {
+      if (doNext && end.checkValidity())  {
         endSecs = vttEnd.value.split(':').reduce((acc,time) => (60 * acc) + +time);
         console.log("Input is Valid...");
       } else {
         end.setCustomValidity("value does not match pattern hh:mm:ss");
         doNext = false;
+        end.reportValidity();
+        return;
       }
       if (doNext && endSecs > startSecs) {
-        if (textRef.reportValidity()) {
+        if (vttText.value.match("^\\d{9}(?:|, \\d{9})+$")) {
           const productArray = vttText.value.split(",");
           vttError.value = null;
           pushCue({startTime: startSecs, endTime: endSecs, text: productArray});
         } else {
           textRef.setCustomValidity("value is not a valid set of product ids");
+          textRef.reportValidity();
           vttError.value = "Input is not a list of products";
         }
       }
@@ -120,8 +122,7 @@ export default {
       inputHandler,
       buildVTT,
       inputPattern,
-      vttError,
-      textAreaPattern
+      vttError
     };
   },
 
@@ -139,7 +140,7 @@ export default {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: space-evenly;
+    justify-content: space-around;
     width: 340px;
     .error {
       display: none;
@@ -178,7 +179,7 @@ export default {
       }
       input {
         line-height: 30px;
-        width: 155px;
+        width: 145px;
         font-size: 14px;
         text-indent: 5px;
         border-radius: 6px;
@@ -198,12 +199,13 @@ export default {
         left: 20px;
       }
       textarea {
-        width: 310px;
+        width: 320px;
         height: 80px;
         resize: none;
         padding: 10px 5px;
         border: 1px solid darkgray;
         border-radius: 6px;
+        box-sizing: border-box;
         outline: none;
         &::placeholder {
           color: #b8b7b7;
