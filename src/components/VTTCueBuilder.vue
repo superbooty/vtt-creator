@@ -67,7 +67,6 @@ export default {
 
     // methods
     const inputHandler = (e) => {
-        console.log("changed...", e.target);
         e.target.setCustomValidity("");
     };
 
@@ -79,26 +78,23 @@ export default {
       let startSecs = 0;
       let endSecs = 0;
       // .split(':').reduce((acc,time) => (60 * acc) + +time);
-      let doNext = true;
       if (start.checkValidity())  {
         startSecs = vttStart.value.split(':').reduce((acc,time) => (60 * acc) + +time);
         console.log("Input is Valid...");
       } else {
         start.setCustomValidity("value does not match pattern hh:mm:ss");
-        doNext = false;
         start.reportValidity();
         return;
       }
-      if (doNext && end.checkValidity())  {
+      if (end.checkValidity())  {
         endSecs = vttEnd.value.split(':').reduce((acc,time) => (60 * acc) + +time);
         console.log("Input is Valid...");
       } else {
         end.setCustomValidity("value does not match pattern hh:mm:ss");
-        doNext = false;
         end.reportValidity();
         return;
       }
-      if (doNext && endSecs > startSecs) {
+      if (endSecs > startSecs) {
         if (vttText.value.match("^\\d{9}(?:|,?(| )\\d{9})*$")) {
           const productArray = vttText.value.split(",");
           vttError.value = null;
@@ -108,6 +104,8 @@ export default {
           textRef.reportValidity();
           vttError.value = "Input is not a list of products, make sure that you type in a list of pc9s separated by commas";
         }
+      } else {
+        vttError.value = "Cue End Time must be greater than Start Time";
       }
       console.log("STATE :: ", state);
     }
@@ -145,6 +143,7 @@ export default {
     .error {
       display: none;
       &.on {
+        display: block;
         background: #ff8686;
         font-weight: 800;
         border-radius: 6px;
