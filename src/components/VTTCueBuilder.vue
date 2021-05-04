@@ -143,8 +143,12 @@ export default {
     justify-content: space-around;
     width: 340px;
     position: absolute;
-    top: 40px;
+    top: 30px;
     left: -10px;
+    border: 1px solid #dfdfdf;
+    padding: 30px 0 10px;
+    border-radius: 10px;
+    background: #eeeeee;
     .error {
       display: none;
       &.on {
