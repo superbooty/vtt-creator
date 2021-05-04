@@ -45,6 +45,7 @@
 <script>
 import { ref } from "vue";
 import {appState} from "@/state/appState";
+import {downloadToFile} from "@/utils/FileUtils";
 
 export default {
   props: {
@@ -99,6 +100,7 @@ export default {
           const productArray = vttText.value.split(",");
           vttError.value = null;
           pushCue({startTime: startSecs, endTime: endSecs, text: productArray});
+          downloadToFile(vttText.value, "meta.json", "application/json");
         } else {
           textRef.setCustomValidity("value is not a valid set of product ids");
           textRef.reportValidity();
@@ -140,6 +142,9 @@ export default {
     flex-wrap: wrap;
     justify-content: space-around;
     width: 340px;
+    position: absolute;
+    top: 40px;
+    left: -10px;
     .error {
       display: none;
       &.on {
@@ -193,6 +198,8 @@ export default {
       }
     }
     .meta-text {
+      display: flex;
+      justify-content: center;
       width: 340px;
       margin: 0;
       label {
