@@ -45,7 +45,6 @@
 <script>
 import { ref } from "vue";
 import {appState} from "@/state/appState";
-import {downloadToFile} from "@/utils/FileUtils";
 
 export default {
   props: {
@@ -55,7 +54,7 @@ export default {
   setup(props) {
     console.log("Item Selector PROPS :: ", props);
 
-    const { state, pushCue } = appState();
+    const { pushCue, stringifyVTT} = appState();
 
     const vttStart = ref("");
     const vttStartRef= ref(null);
@@ -100,7 +99,7 @@ export default {
           const productArray = vttText.value.split(",");
           vttError.value = null;
           pushCue({startTime: startSecs, endTime: endSecs, text: productArray});
-          downloadToFile(vttText.value, "meta.json", "application/json");
+          // console.log("VTT OBJ :: ", state.value.vttObj);
         } else {
           textRef.setCustomValidity("value is not a valid set of product ids");
           textRef.reportValidity();
@@ -109,7 +108,7 @@ export default {
       } else {
         vttError.value = "Cue End Time must be greater than Start Time";
       }
-      console.log("STATE :: ", state);
+      console.log("STATE :: ", stringifyVTT());
     }
 
     return {
