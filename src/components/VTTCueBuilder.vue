@@ -149,6 +149,18 @@ export default {
     padding: 30px 0 10px;
     border-radius: 10px;
     background: #eeeeee;
+    &::after {
+      content: '';
+      width: 0;
+      height: 0;
+      border: 10px solid transparent;
+      border-bottom-color: #eee;
+      border-top-width: 0px;
+      left: 10px;
+      top: -10px;
+      position: absolute;
+      clear: both;
+    }
     .error {
       display: none;
       &.on {
