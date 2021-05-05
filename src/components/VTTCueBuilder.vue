@@ -43,18 +43,18 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import {appState} from "@/state/appState";
 
 export default {
   props: {
-    cueCode: String,
+    cue: Object
   },
 
-  setup(props) {
+  setup(props, {emit}) {
     console.log("Item Selector PROPS :: ", props);
 
-    const { pushCue, stringifyVTT} = appState();
+    const { pushCue} = appState();
 
     const vttStart = ref("");
     const vttStartRef= ref(null);
@@ -100,6 +100,8 @@ export default {
           vttError.value = null;
           pushCue({startTime: startSecs, endTime: endSecs, text: productArray});
           // console.log("VTT OBJ :: ", state.value.vttObj);
+          // all good close the cue
+          emit("close-builder", props.cue);
         } else {
           textRef.setCustomValidity("value is not a valid set of product ids");
           textRef.reportValidity();
@@ -108,8 +110,25 @@ export default {
       } else {
         vttError.value = "Cue End Time must be greater than Start Time";
       }
-      console.log("STATE :: ", stringifyVTT());
     }
+
+    const formatCueTime = (timestamp) => {
+      var hours = Math.floor(timestamp / 60 / 60);
+      // 37
+      var minutes = Math.floor(timestamp / 60) - (hours * 60);
+      // 42
+      var seconds = timestamp % 60;
+      return hours.toString().padStart(2, '0') + ':' +
+        minutes.toString().padStart(2, '0') + ':' +
+          seconds.toString().padStart(2, '0');
+    }
+
+    // hooks
+    onMounted(() => {
+      vttStart.value = formatCueTime(props.cue.startTime);
+      // end time as a default is 2 seconds after star time
+      vttEnd.value = formatCueTime(props.cue.startTime + 2);
+    })
 
     return {
       vttStart,

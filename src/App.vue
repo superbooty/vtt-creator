@@ -4,7 +4,7 @@
     <span class="menu-lbl" @click="showMenu = !showMenu">
       <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTMgNmgtMTN2LTRoMTN2NHptMCA0aC0xM3Y0aDEzdi00em0wIDhoLTEzdjRoMTN2LTR6bTMtOGw0IDUuMDc1IDQtNS4wNzVoLTh6Ii8+PC9zdmc+">
     </span>
-    <div class="notice">Click on green bar to generate a Cue at a point in time of the video. The bar is calibrated to the length of the video</div>
+    <div class="notice">Click on blue progress bar to generate a Cue at a point in time as the video plays. The bar is calibrated to the length of the video</div>
     <ul class="menu" :class="{'off': !showMenu}">
       <li class="menu-item" @click="downloadVTT">Download VTT</li>
     </ul>
@@ -29,12 +29,12 @@
     <div class="progress" ref="progressRef">
       <div v-bind:style="{width: currentPlayTime}" @click="addCuePointer"></div>
     </div>
-    <div class="builder-tester" :class="{'active': cue.active}"
+    <div class="builder-tester" :class="{'active': cue.active, 'saved': cue.saved}"
       v-bind:style="{left: cue.leftPos}" v-for="cue in cueList" 
       :key="cue.id" @click.stop="activateCue($event, cue.id)">
       <span v-if="cue.active" >{{cue.startTime}} secs</span>
       <button class="cue-creator"></button>
-      <cue-builder v-if="cue.active" @click.stop.prevent></cue-builder>
+      <cue-builder :cue="cue" v-if="cue.active" @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
     </div>
   </div>
 </template>
@@ -84,12 +84,18 @@ export default {
       cue.id = cueList.value.length;
       cue.leftPos = (e.pageX - 18) + "px";
       cue.active = false;
+      cue.saved = false;
       // time of cue
       let cueStartTime = e.pageX/scale;
       cue.startTime = Math.round(cueStartTime);
       cueList.value.push(cue);
       console.log("CUE :: ", cue);
       activateCue(e, cue.id);
+    }
+
+    const closeBuilder = (cue) => {
+      cue.active = false;
+      cue.saved = true;
     }
 
     const downloadVTT = () => {
@@ -122,7 +128,8 @@ export default {
       progressRef,
       showMenu,
       downloadToFile,
-      downloadVTT
+      downloadVTT,
+      closeBuilder
     }
   },
 
@@ -252,9 +259,18 @@ export default {
     margin: 8px;
     .builder-tester {
       position: relative;
-      top: 7px;
+      top: 5px;
       font-family: Arial, Helvetica, sans-serif;
-      &.active {
+      button {
+        position: absolute;
+        border: 1px solid;
+        border-radius: 20px;
+        width: 20px;
+        height: 20px;
+        box-sizing: border-box;
+        z-index: 100;
+      }
+      &.active, &.saved {
         &::after {
           content: "✔︎";
           color: green;
@@ -269,7 +285,7 @@ export default {
           position: absolute;
           left: -18px;
           top: -20px;
-          background: #509b4e;
+          background: green;
           font-size: 12px;
           font-weight: 700;
           border: 1px solid white;
@@ -279,27 +295,27 @@ export default {
           white-space: nowrap;
         }
       }
-      button {
-        position: absolute;
-        border: 1px solid;
-        border-radius: 20px;
-        width: 20px;
-        height: 20px;
-        box-sizing: border-box;
-        z-index: 100;
+      &.saved {
+        &::after {
+          color: #ffffff;
+        }
+        button {
+          background: green;
+        }
       }
     }
     .progress {
       display: flex;
       position: relative;
       top: 20px;
-      height: 5px;
+      height: 8px;
       width: 100%;
+      border-radius: 4px;
       background: #e6e6e6;
       flex-direction: row;
       div {
-        background-color: #509b4e;
-        width: 90%; /* Adjust with JavaScript */
+        background-color: #4e92f7;
+        border-radius: 4px;
       }
     }
     .separator {
