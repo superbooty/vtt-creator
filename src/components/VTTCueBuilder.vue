@@ -49,7 +49,7 @@ import {downloadToFile} from "@/utils/FileUtils";
 
 export default {
   props: {
-    code: String,
+    cueCode: String,
   },
 
   setup(props) {
