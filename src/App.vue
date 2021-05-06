@@ -89,7 +89,7 @@ export default {
       })
       let cue = cueList.value.find(el => el.id === id);
       videoPlayerRef.value.pause();
-      videoPlayerRef.value.currentTime = cue.startTime;
+      // videoPlayerRef.value.currentTime = cue.startTime;
       cue.active = !cue.active;
     }
 
@@ -105,6 +105,7 @@ export default {
       cue.startTime = Math.round(cueStartTime);
       cueList.value.push(cue);
       console.log("CUE :: ", cue);
+      videoPlayerRef.value.pause();
       activateCue(e, cue.id);
     }
 
