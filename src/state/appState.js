@@ -12,10 +12,13 @@ export function appState() {
     const pushCue = (cue) => {
         state.value.vttObj.vttCues.push(cue);
     }
+    const getVTTObj = () => {
+        return state.value.vttObj
+    }
     const stringifyVTT = () => {
         return JSON.stringify(state.value.vttObj, null, 2);
     }   
-    return {state, pushCue, stringifyVTT};
+    return {state, pushCue, stringifyVTT, getVTTObj};
 }
 
 export default {

@@ -96,7 +96,7 @@ export default {
       }
       if (endSecs > startSecs) {
         if (vttText.value.match("^\\d{9}(?:|,?(| )\\d{9})*$")) {
-          const productArray = vttText.value.split(",");
+          const productArray = vttText.value.split(",").map(item=>item.trim());
           vttError.value = null;
           pushCue({startTime: startSecs, endTime: endSecs, text: productArray});
           // console.log("VTT OBJ :: ", state.value.vttObj);
