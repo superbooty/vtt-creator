@@ -1,5 +1,6 @@
 <template>
   <div class="vtt-inputs">
+    <div class="close" @click="deleteCuePointer"></div>
     <div class="start-time">
       <label >start time</label>
       <input
@@ -70,6 +71,10 @@ export default {
         e.target.setCustomValidity("");
     };
 
+    const deleteCuePointer = () => {
+      emit("close-builder", {cue: props.cue, delete: true});
+    }
+
     const buildVTT = () => {
       console.log("Building the VTT");
       const start = vttStartRef.value;
@@ -101,7 +106,7 @@ export default {
           pushCue({startTime: startSecs, endTime: endSecs, text: productArray});
           // console.log("VTT OBJ :: ", state.value.vttObj);
           // all good close the cue
-          emit("close-builder", props.cue);
+          emit("close-builder", {cue: props.cue, delete: false});
         } else {
           textRef.setCustomValidity("value is not a valid set of product ids");
           textRef.reportValidity();
@@ -140,7 +145,8 @@ export default {
       inputHandler,
       buildVTT,
       inputPattern,
-      vttError
+      vttError,
+      deleteCuePointer,
     };
   },
 
@@ -193,6 +199,21 @@ export default {
         margin: 0 10px 15px;
         padding: 10px;
         text-align: left;
+      }
+    }
+    .close {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      border-radius: 18px;
+      width: 18px;
+      height: 18px;
+      background: #eeeeee;
+    padding: 4px;
+      &::after {
+        content: '✖️';
+        position: relative;
+        top: -4px;
       }
     }
     button {

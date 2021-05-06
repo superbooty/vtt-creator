@@ -96,7 +96,19 @@ export default {
     const addCuePointer = (e) => {
       const scale = progressRef.value.offsetWidth/seconds.value;
       let cue = {};
-      cue.id = cueList.value.length;
+      const generateUUID = () => {
+        let
+          d = new Date().getTime();
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+          let r = Math.random() * 16;
+          if (d > 0) {
+            r = (d + r) % 16 | 0;
+            d = Math.floor(d / 16);
+          }
+          return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
+        });
+      };
+      cue.id = generateUUID;
       cue.leftPos = (e.pageX - 18) + "px";
       cue.active = false;
       cue.saved = false;
@@ -109,9 +121,15 @@ export default {
       activateCue(e, cue.id);
     }
 
-    const closeBuilder = (cue) => {
-      cue.active = false;
-      cue.saved = true;
+    const closeBuilder = (options) => {
+      if (options.delete) {
+        cueList.value = cueList.value.filter(function(item) {
+            return item.id !== options.cue.id;
+        })
+      } else {
+        options.cue.active = false;
+        options.cue.saved = true;
+      }
     }
 
     const downloadVTT = () => {
