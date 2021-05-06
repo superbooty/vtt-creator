@@ -44,6 +44,11 @@
         <cue-builder :cue="cue" v-if="cue.active" @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
       </div>
     </template>
+    <div class="test-items">
+      Tops: 196980006, 197060006, 287880003, 287880004, 196950008, 197540002, 197540003
+      <br>
+      Bottoms: 278890002, 188810412, 188820445, 196260276, 349640112, 177800038, 188810052
+    </div>
   </div>
 </template>
 
@@ -195,8 +200,9 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.floating {
-  position: absolute;
+.test-items {
+  position: fixed;
+  bottom: 10px;
 }
 .notice {
   justify-content: center;
