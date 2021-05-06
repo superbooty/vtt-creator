@@ -134,6 +134,7 @@ export default {
       vttStart.value = formatCueTime(props.cue.startTime);
       // end time as a default is 2 seconds after star time
       vttEnd.value = formatCueTime(props.cue.startTime + 2);
+      vttText.value = props.cue.text;
     })
 
     return {

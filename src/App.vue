@@ -118,6 +118,7 @@ export default {
         return uuid;
       };
       cue.id = generateUUID();
+      cue.text = "";
       cue.leftPos = (e.pageX - 18) + "px";
       cue.active = false;
       cue.saved = false;
@@ -173,13 +174,16 @@ export default {
               console.log("File ::", fr.result);
               uploadVTT(fr.result);
               // create the cues
-              getVTTObj().vttCues.forEach(vttCue => {
+              const vttCopy = Object.assign({}, getVTTObj());
+              vttCopy["vttCues"].forEach(vttCue => {
                 let cue = {};
                 cue.id = vttCue.id;
-                cue.leftPos = vttCue.startTime * scale.value;
+                cue.leftPos = (vttCue.startTime * scale.value) + "px";
                 cue.startTime = vttCue.startTime;
                 cue.saved = true;
                 cue.active = false;
+                cue.text = vttCue.text;
+                cueList.value.push(cue);
               })
           }
           fr.readAsText(this.files[0]);
