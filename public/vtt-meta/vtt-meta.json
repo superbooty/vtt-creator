@@ -1,0 +1,21 @@
+{
+    "vttType": "metadata",
+    "vttCues": [
+      {
+        "startTime": 5,
+        "endTime": 7,
+        "text": [
+          "287880004"
+        ]
+      },
+      {
+        "startTime": 7,
+        "endTime": 9,
+        "text": [
+          "188810412",
+          " 188810052",
+          "287880003"
+        ]
+      }
+    ]
+  }

@@ -15,10 +15,13 @@ export function appState() {
     const getVTTObj = () => {
         return state.value.vttObj
     }
+    const uploadVTT = (fileContent) => {
+        state.value.vttObj = JSON.parse(fileContent);
+    }
     const stringifyVTT = () => {
         return JSON.stringify(state.value.vttObj, null, 2);
     }   
-    return {state, pushCue, stringifyVTT, getVTTObj};
+    return {state, pushCue, stringifyVTT, getVTTObj, uploadVTT};
 }
 
 export default {

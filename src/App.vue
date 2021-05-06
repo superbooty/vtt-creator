@@ -9,6 +9,10 @@
     <ul class="menu" :class="{'off': !showMenu}">
       <li class="menu-item" @click="downloadVTT">Download VTT</li>
       <li class="menu-item" :class="{'on': previewVid}" @click="previewVideo">Preview Video with VTT</li>
+      <li class="menu-item">
+        upload VTT data from a file
+        <input type="file" id="vtt-file" name="vtt-file" ref="vttFileRef"/>
+      </li>
     </ul>
   </section>
   <div class="app-body">
@@ -79,8 +83,9 @@ export default {
     const playPos = ref(0);
     const showMenu = ref(false);
     const previewVid = ref(false);
+    const vttFileRef = ref(null);
 
-    const {stringifyVTT} = appState();
+    const {stringifyVTT, uploadVTT} = appState();
 
     // methods
     const activateCue = (e, id) => {
@@ -163,6 +168,17 @@ export default {
         currentPlayTime.value = Math.floor(currentTime);
         console.log("pLAYING TIME :: ", playPos.value);
       }
+      const vttFile = vttFileRef.value;
+      vttFile.addEventListener('change', function() {
+          var fr=new FileReader();
+          fr.onload= () => {
+              console.log("File ::", fr.result);
+              uploadVTT(fr.result);
+          }
+          fr.readAsText(this.files[0]);
+      })
+
+      // window events
       const hr = headerRef.value;
       window.addEventListener("click", function(e) {
         // close dropdown when clicked outside
@@ -188,7 +204,8 @@ export default {
       closeBuilder,
       previewVid,
       previewVideo,
-      headerRef
+      headerRef,
+      vttFileRef
     }
   },
 
