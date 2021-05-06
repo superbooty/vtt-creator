@@ -130,13 +130,13 @@ export default {
       videoPlayerRef.value.load();
       videoPlayerRef.value.onloadedmetadata = function() {
           console.log("LENGTH :: ", this.duration);
-          seconds.value = Math.round(this.duration);
+          seconds.value = Math.floor(this.duration);
           scale = progressRef.value.offsetWidth/seconds.value;
       };
       videoPlayerRef.value.ontimeupdate = function() {
         let currentTime = this.currentTime;
-        playPos.value = Math.round(currentTime * scale) + "px";
-        currentPlayTime.value = Math.round(currentTime);
+        playPos.value = Math.floor(currentTime * scale) + "px";
+        currentPlayTime.value = Math.floor(currentTime);
         console.log("pLAYING TIME :: ", playPos.value);
       }
       const hr = headerRef.value;
