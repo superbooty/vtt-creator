@@ -10,8 +10,8 @@
       <li class="menu-item" @click="downloadVTT">Download VTT</li>
       <li class="menu-item" :class="{'on': previewVid}" @click="previewVideo">Preview Video with VTT</li>
       <li class="menu-item">
-        upload VTT data from a file
-        <input type="file" id="vtt-file" name="vtt-file" ref="vttFileRef"/>
+        <span :class="{'off': previewVid}" >Upload VTT data from a file</span>
+        <input v-if="!previewVid" type="file" id="vtt-file" name="vtt-file" ref="vttFileRef"/>
       </li>
     </ul>
   </section>
@@ -84,8 +84,9 @@ export default {
     const showMenu = ref(false);
     const previewVid = ref(false);
     const vttFileRef = ref(null);
+    const scale = ref(1);
 
-    const {stringifyVTT, uploadVTT} = appState();
+    const {stringifyVTT, uploadVTT, getVTTObj} = appState();
 
     // methods
     const activateCue = (e, id) => {
@@ -104,26 +105,24 @@ export default {
     }
 
     const addCuePointer = (e) => {
-      const scale = progressRef.value.offsetWidth/seconds.value;
+      scale.value = progressRef.value.offsetWidth/seconds.value;
       let cue = {};
       const generateUUID = () => {
-        let
-          d = new Date().getTime();
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-          let r = Math.random() * 16;
-          if (d > 0) {
-            r = (d + r) % 16 | 0;
-            d = Math.floor(d / 16);
-          }
-          return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
+        var d2 = (performance && performance.now && (performance.now()*1000)) || 0;//Time in microseconds since page-load or 0 if unsupported
+        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          var r = Math.random() * 16;
+          r = (d2 + r)%16 | 0;
+          d2 = Math.floor(d2/16);
+          return (c=='x' ? r : (r&0x7|0x8)).toString(16);
         });
+        return uuid;
       };
-      cue.id = generateUUID;
+      cue.id = generateUUID();
       cue.leftPos = (e.pageX - 18) + "px";
       cue.active = false;
       cue.saved = false;
       // time of cue
-      let cueStartTime = e.pageX/scale;
+      let cueStartTime = e.pageX/scale.value;
       cue.startTime = Math.round(cueStartTime);
       cueList.value.push(cue);
       console.log("CUE :: ", cue);
@@ -155,16 +154,15 @@ export default {
 
      // hooks
     onMounted(() => {
-      let scale = 0;
       videoPlayerRef.value.load();
       videoPlayerRef.value.onloadedmetadata = function() {
           console.log("LENGTH :: ", this.duration);
           seconds.value = Math.floor(this.duration);
-          scale = progressRef.value.offsetWidth/seconds.value;
+          scale.value = progressRef.value.offsetWidth/seconds.value;
       };
       videoPlayerRef.value.ontimeupdate = function() {
         let currentTime = this.currentTime;
-        playPos.value = Math.floor(currentTime * scale) + "px";
+        playPos.value = Math.floor(currentTime * scale.value) + "px";
         currentPlayTime.value = Math.floor(currentTime);
         console.log("pLAYING TIME :: ", playPos.value);
       }
@@ -174,6 +172,15 @@ export default {
           fr.onload= () => {
               console.log("File ::", fr.result);
               uploadVTT(fr.result);
+              // create the cues
+              getVTTObj().vttCues.forEach(vttCue => {
+                let cue = {};
+                cue.id = vttCue.id;
+                cue.leftPos = vttCue.startTime * scale.value;
+                cue.startTime = vttCue.startTime;
+                cue.saved = true;
+                cue.active = false;
+              })
           }
           fr.readAsText(this.files[0]);
       })
@@ -317,6 +324,11 @@ export default {
       font-size: 14px;
       font-weight: 800;
       letter-spacing: 1.1px;
+      span {
+        &.off {
+          color: #c7c7c7;
+        }
+      }
       &.on {
         &::after {
           content: "✔︎";
