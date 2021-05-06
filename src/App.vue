@@ -32,12 +32,14 @@
     </div>
     <template v-if="!previewVid">
       <div class="progress" ref="progressRef">
-        <div v-bind:style="{width: currentPlayTime}" @click="addCuePointer"></div>
+        <div v-bind:style="{width: playPos}" @click="addCuePointer">
+          <span class="vid-time" v-bind:style="{left: playPos}">{{currentPlayTime}} seconds</span>
+        </div>
       </div>
       <div class="builder-tester" :class="{'active': cue.active, 'saved': cue.saved}"
         v-bind:style="{left: cue.leftPos}" v-for="cue in cueList" 
         :key="cue.id" @click.stop="activateCue($event, cue.id)">
-        <span v-if="cue.active" >{{cue.startTime}} secs</span>
+        <!-- <span v-if="cue.active" >{{cue.startTime}} secs</span> -->
         <button class="cue-creator"></button>
         <cue-builder :cue="cue" v-if="cue.active" @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
       </div>
@@ -69,6 +71,7 @@ export default {
     const cueList = ref([])
     const seconds = ref(0);
     const currentPlayTime = ref(0);
+    const playPos = ref(0);
     const showMenu = ref(false);
     const previewVid = ref(false);
 
@@ -131,8 +134,10 @@ export default {
           scale = progressRef.value.offsetWidth/seconds.value;
       };
       videoPlayerRef.value.ontimeupdate = function() {
-        currentPlayTime.value = Math.round(this.currentTime * scale) + "px";
-        console.log("pLAYING TIME :: ", currentPlayTime.value);
+        let currentTime = this.currentTime;
+        playPos.value = Math.round(currentTime * scale) + "px";
+        currentPlayTime.value = Math.round(currentTime);
+        console.log("pLAYING TIME :: ", playPos.value);
       }
       const hr = headerRef.value;
       window.addEventListener("click", function(e) {
@@ -151,6 +156,7 @@ export default {
       addCuePointer,
       videoPlayerRef,
       currentPlayTime,
+      playPos,
       progressRef,
       showMenu,
       downloadToFile,
@@ -295,7 +301,6 @@ export default {
     margin: 8px;
     .builder-tester {
       position: relative;
-      top: 5px;
       font-family: Arial, Helvetica, sans-serif;
       button {
         position: absolute;
@@ -344,14 +349,22 @@ export default {
       display: flex;
       position: relative;
       top: 20px;
-      height: 8px;
+      height: 20px;
       width: 100%;
-      border-radius: 4px;
+      border-radius: 16px;
       background: #e6e6e6;
       flex-direction: row;
       div {
         background-color: #4e92f7;
-        border-radius: 4px;
+        border-radius: 16px;
+        .vid-time {
+          position: absolute;
+          color: #111111;
+          top: -15px;
+          left: 10px;
+          font-size: 12px;
+          font-family: arial;
+        }
       }
     }
     .separator {
