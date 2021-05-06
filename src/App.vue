@@ -40,7 +40,7 @@
         v-bind:style="{left: cue.leftPos}" v-for="cue in cueList" 
         :key="cue.id" @click.stop="activateCue($event, cue.id)">
         <!-- <span v-if="cue.active" >{{cue.startTime}} secs</span> -->
-        <button class="cue-creator"></button>
+        <button class="cue-creator" :class="{'active': cue.active, 'saved': cue.saved}"></button>
         <cue-builder :cue="cue" v-if="cue.active" @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
       </div>
     </template>
@@ -310,6 +310,9 @@ export default {
         height: 20px;
         box-sizing: border-box;
         z-index: 100;
+        &.active, &.saved {
+          z-index: 201;
+        }
       }
       &.active, &.saved {
         &::after {
@@ -320,7 +323,7 @@ export default {
           left: 0px;
           top: 2px;
           font-size: 13px;
-          z-index: 101;
+          z-index: 201;
         }
         span {
           position: absolute;
