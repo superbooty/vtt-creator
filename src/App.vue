@@ -34,16 +34,17 @@
       >
       </video>
     </div>
+    {{displayTime}}
     <template v-if="!previewVid">
       <div class="progress" ref="progressRef">
-        <div v-bind:style="{width: playPos}" @click="addCuePointer">
-          <span class="vid-time" v-bind:style="{left: playPos}">{{currentPlayTime}} seconds</span>
+        <div v-bind:style="{width: cuePos}" @click="addCuePointer">
+          <span class="vid-time" v-bind:style="{left: dtPos}">{{dt}}</span>
         </div>
       </div>
       <div class="builder-tester" :class="{'active': cue.active, 'saved': cue.saved}"
         v-bind:style="{left: cue.leftPos}" v-for="cue in cueList" 
         :key="cue.id" @click.stop="activateCue($event, cue.id)">
-        <!-- <span v-if="cue.active" >{{cue.startTime}} secs</span> -->
+        <span v-if="cue.active" >{{cue.startTime}} secs</span>
         <button class="cue-creator" :class="{'active': cue.active, 'saved': cue.saved}"></button>
         <cue-builder :cue="cue" v-if="cue.active" @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
       </div>
@@ -65,7 +66,7 @@ const CueBuilder = defineAsyncComponent(
   () => import("./components/VTTCueBuilder.vue")
 );
 
-import { ref, defineAsyncComponent, onMounted } from "vue";
+import { ref, computed, defineAsyncComponent, onMounted } from "vue";
 import {appState} from "@/state/appState";
 import {downloadToFile} from "@/utils/FileUtils";
 
@@ -87,6 +88,19 @@ export default {
     const scale = ref(1);
 
     const {stringifyVTT, uploadVTT, getVTTObj} = appState();
+
+    // computed
+    const dt = computed(() => {
+      return formatCueTime(currentPlayTime.value);
+    })
+
+    const dtPos = computed(() => {
+       return (playPos.value - 46) + "px";
+    })
+
+    const cuePos = computed(() => {
+       return playPos.value + "px";
+    })
 
     // methods
     const activateCue = (e, id) => {
@@ -153,19 +167,28 @@ export default {
       showMenu.value = false;
     }
 
+    const formatCueTime = (timestamp) => {
+      var hours = Math.floor(timestamp / 60 / 60);
+      // 37
+      var minutes = Math.floor(timestamp / 60) - (hours * 60);
+      // 42
+      var seconds = timestamp % 60;
+      return hours.toString().padStart(2, '0') + ':' +
+        minutes.toString().padStart(2, '0') + ':' +
+          seconds.toString().padStart(2, '0');
+    }
+
      // hooks
     onMounted(() => {
       videoPlayerRef.value.load();
       videoPlayerRef.value.onloadedmetadata = function() {
-          console.log("LENGTH :: ", this.duration);
           seconds.value = Math.floor(this.duration);
           scale.value = progressRef.value.offsetWidth/seconds.value;
       };
       videoPlayerRef.value.ontimeupdate = function() {
         let currentTime = this.currentTime;
-        playPos.value = Math.floor(currentTime * scale.value) + "px";
+        playPos.value = Math.floor(currentTime * scale.value);
         currentPlayTime.value = Math.floor(currentTime);
-        console.log("pLAYING TIME :: ", playPos.value);
       }
       const vttFile = vttFileRef.value;
       vttFile.addEventListener('change', function() {
@@ -200,6 +223,9 @@ export default {
     });
 
     return {
+      dt,
+      dtPos,
+      cuePos,
       showCueBuilder,
       activateCue,
       test,
