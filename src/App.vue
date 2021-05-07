@@ -295,13 +295,22 @@ export default {
       display: block;
       top: -30px;
       border-radius: 20px;
-      background: gray;
+      background: #efefef;
       margin: 5px;
+      &.l-cue-active, &.l-saved {
+        &::after {
+          content: "✔︎";
+          color: green;
+          position: relative;
+          left: 4px;
+          top: 2px;
+        }
+      }
       &.l-saved {
         background: green;
-      }
-      &.l-cue-on {
-        background: #efefef
+        &::after {
+          color: white
+        }
       }
     }
   }
