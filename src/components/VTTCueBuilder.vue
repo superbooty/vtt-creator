@@ -39,7 +39,8 @@
         @input="inputHandler"
       />
     </div>
-    <button class="save-cue" @click="buildVTT">Save Cue</button>
+    <button v-if="!cue.saved" @click="buildVTT">Save Cue</button>
+    <div v-else class="saved-cue">Already Saved</div>
   </div>
 </template>
 
@@ -190,6 +191,14 @@ export default {
       top: -10px;
       position: absolute;
       clear: both;
+    }
+    .saved-cue {
+      line-height: 32px;
+      &::after {
+        content: "✔︎";
+        padding: 10px;
+        color: green;
+      }
     }
     .error {
       display: none;
