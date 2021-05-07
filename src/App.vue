@@ -6,6 +6,12 @@
     </span>
     <span v-if="previewVid" class="preview"></span>
     <div class="notice">Click on the blue progress bar to generate a VTT Cue as the video plays. The bar is calibrated to the length of the video</div>
+    <div class="legend">
+      Cue Legend
+      <span class="l-saved"></span>
+      <span class="l-cue-on"></span>
+      <span class="l-cue-active"></span>
+    </div>
     <ul class="menu" :class="{'off': !showMenu}">
       <li class="menu-item" @click="downloadVTT">Download VTT</li>
       <li class="menu-item" :class="{'on': previewVid}" @click="previewVideo">Preview Video with VTT</li>
@@ -270,6 +276,33 @@ export default {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;
   border-bottom: 1px solid #d0d0d0;
+  .legend {
+    position: absolute;
+    right: 10px;
+    width: 100px;
+    display: flex;
+    top: 10px;
+    justify-content: space-around;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    background: white;
+    span {
+      border: 1px solid gray;
+      width: 16px;
+      height: 16px;
+      display: block;
+      top: -30px;
+      border-radius: 20px;
+      background: gray;
+      margin: 5px;
+      &.l-saved {
+        background: green;
+      }
+      &.l-cue-on {
+        background: #efefef
+      }
+    }
+  }
   .menu-cue {
     height: 40px;
     width: 5px;

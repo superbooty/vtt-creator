@@ -224,13 +224,14 @@ export default {
     }
     button {
       width: 100%;
-      margin: 5px;
+      margin: 10px 10px 0;
       height: 34px;
       outline: none;
-      background:#0b5dcc;
+      background: #0b5dcc;
       color: white;
       font-weight: 800;
       box-sizing: border-box;
+      border-radius: 6px;
     }
     .start-time, .end-time, .meta-text {
         position: relative;
