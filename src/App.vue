@@ -138,7 +138,7 @@ export default {
       cue.saved = false;
       // time of cue
       let cueStartTime = e.pageX/scale.value;
-      cue.startTime = Math.round(cueStartTime);
+      cue.startTime = Math.floor(cueStartTime);
       cueList.value.push(cue);
       console.log("CUE :: ", cue);
       videoPlayerRef.value.pause();
