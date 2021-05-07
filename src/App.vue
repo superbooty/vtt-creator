@@ -95,7 +95,7 @@ export default {
     })
 
     const dtPos = computed(() => {
-       return (playPos.value - 46) + "px";
+       return (playPos.value - 52) + "px";
     })
 
     const cuePos = computed(() => {
@@ -446,10 +446,10 @@ export default {
         border-radius: 16px;
         .vid-time {
           position: absolute;
-          color: #111111;
-          top: -15px;
-          left: 10px;
+          color: white;
+          top: 4px;
           font-size: 12px;
+          font-weight: 800;
           font-family: arial;
         }
       }
