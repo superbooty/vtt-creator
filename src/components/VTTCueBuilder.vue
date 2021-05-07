@@ -55,7 +55,7 @@ export default {
   setup(props, {emit}) {
     console.log("Item Selector PROPS :: ", props);
 
-    const { pushCue} = appState();
+    const { pushCue, getVTTObj} = appState();
 
     const vttStart = ref("");
     const vttStartRef= ref(null);
@@ -134,7 +134,11 @@ export default {
       vttStart.value = formatCueTime(props.cue.startTime);
       // end time as a default is 2 seconds after star time
       vttEnd.value = formatCueTime(props.cue.startTime + 2);
-      vttText.value = props.cue.text;
+      const vttCopy = Object.assign({}, getVTTObj());
+      const savedCue = vttCopy["vttCues"].find(vttCue => {
+        return vttCue.id === props.cue.id;
+      });
+      vttText.value = savedCue ? savedCue.text : "";
     })
 
     return {
@@ -242,7 +246,7 @@ export default {
       input {
         line-height: 30px;
         width: 145px;
-        font-size: 14px;
+        font-size: 13px;
         text-indent: 5px;
         border-radius: 6px;
         border: 1px solid darkgray;

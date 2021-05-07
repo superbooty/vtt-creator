@@ -34,7 +34,6 @@
       >
       </video>
     </div>
-    {{displayTime}}
     <template v-if="!previewVid">
       <div class="progress" ref="progressRef">
         <div v-bind:style="{width: cuePos}" @click="addCuePointer">
@@ -95,7 +94,7 @@ export default {
     })
 
     const dtPos = computed(() => {
-       return (playPos.value - 52) + "px";
+       return (playPos.value - 40) + "px";
     })
 
     const cuePos = computed(() => {
@@ -173,8 +172,7 @@ export default {
       var minutes = Math.floor(timestamp / 60) - (hours * 60);
       // 42
       var seconds = timestamp % 60;
-      return hours.toString().padStart(2, '0') + ':' +
-        minutes.toString().padStart(2, '0') + ':' +
+      return minutes.toString().padStart(2, '0') + ':' +
           seconds.toString().padStart(2, '0');
     }
 
@@ -452,9 +450,9 @@ export default {
           font-weight: 800;
           font-family: arial;
           box-sizing: border-box;
-          border: 1px solid red;
+          border: 1px solid #000000;
           padding: 2px 3px;
-          background: red;
+          background: #000000;
           border-radius: 16px;
         }
       }
