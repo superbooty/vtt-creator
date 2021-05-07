@@ -441,16 +441,21 @@ export default {
       border-radius: 16px;
       background: #e6e6e6;
       flex-direction: row;
+      overflow-y: hidden;
       div {
         background-color: #4e92f7;
         border-radius: 16px;
         .vid-time {
           position: absolute;
           color: white;
-          top: 4px;
           font-size: 12px;
           font-weight: 800;
           font-family: arial;
+          box-sizing: border-box;
+          border: 1px solid red;
+          padding: 2px 3px;
+          background: red;
+          border-radius: 16px;
         }
       }
     }
