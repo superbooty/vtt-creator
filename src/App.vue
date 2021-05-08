@@ -7,7 +7,6 @@
     <span v-if="previewVid" class="preview"></span>
     <div class="notice">Click on the blue progress bar to generate a VTT Cue as the video plays. The bar is calibrated to the length of the video</div>
     <div class="legend">
-      Cue Legend
       <span class="l-saved"></span>
       <span class="l-cue-on"></span>
       <span class="l-cue-active"></span>
@@ -284,6 +283,7 @@ export default {
     width: 100px;
     display: flex;
     top: 10px;
+    line-height: 18px;
     justify-content: space-around;
     flex-wrap: nowrap;
     flex-direction: column;
@@ -297,18 +297,30 @@ export default {
       border-radius: 20px;
       background: #efefef;
       margin: 5px;
+      &::after {
+        content: "cue pointer";
+        position: absolute;
+        left: 30px;
+      }
       &.l-cue-active, &.l-saved {
-        &::after {
+        &::before {
           content: "✔︎";
           color: green;
           position: relative;
           left: 4px;
-          top: 2px;
+        }
+      }
+      &.l-cue-active {
+        &::after {
+          content: "active";
         }
       }
       &.l-saved {
         background: green;
         &::after {
+          content: "saved";
+        }
+        &::before {
           color: white
         }
       }
