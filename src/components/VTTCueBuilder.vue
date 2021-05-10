@@ -35,7 +35,7 @@
         v-model="vttText"
         ref="vttTextRef"
         required
-        placeholder="Enter list of products PC9s (e.g. 188820445,196260276,349640112)"
+        placeholder="Enter list of product PC9s (e.g. 188820445,196260276,349640112)"
         @input="inputHandler"
       />
     </div>
