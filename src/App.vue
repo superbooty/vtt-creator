@@ -7,9 +7,9 @@
     <span v-if="previewVid" class="preview"></span>
     <div class="notice">Click on the blue progress bar to generate a VTT Cue as the video plays. The bar is calibrated to the length of the video</div>
     <div class="legend">
-      <span class="l-saved"></span>
       <span class="l-cue-on"></span>
       <span class="l-cue-active"></span>
+      <span class="l-saved"></span>
     </div>
     <ul class="menu" :class="{'off': !showMenu}">
       <li class="menu-item" @click="downloadVTT">Download VTT</li>

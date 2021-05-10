@@ -35,7 +35,7 @@
         v-model="vttText"
         ref="vttTextRef"
         required
-        placeholder="Enter VTT Text"
+        placeholder="Enter list of products PC9s (e.g. 188820445,196260276,349640112)"
         @input="inputHandler"
       />
     </div>
@@ -288,7 +288,6 @@ export default {
         &::placeholder {
           color: #b8b7b7;
           font-size: 14px;
-          text-align: center;
         }
       }
     }
