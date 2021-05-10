@@ -1,22 +1,31 @@
 {
-    "vttType": "metadata",
-    "vttCues": [
-      {
-        "startTime": 5,
-        "endTime": 7,
-        "text": [
-          "287880004"
-        ]
-      },
-      {
-        "id"
-        "startTime": 7,
-        "endTime": 9,
-        "text": [
-          "188810412",
-          " 188810052",
-          "287880003"
-        ]
-      }
-    ]
-  }
+  "vttType": "metadata",
+  "vttCues": [
+    {
+      "id": "4f31dbfc-031b-4253-ebf4-bdc4d27ecd2b",
+      "startTime": 6,
+      "endTime": 8,
+      "text": [
+        "188820445",
+        "196260276",
+        "349640112"
+      ]
+    },
+    {
+      "id": "e848214e-b08d-4c81-fa8c-712318345bca",
+      "startTime": 10,
+      "endTime": 12,
+      "text": [
+        "197060006"
+      ]
+    },
+    {
+      "id": "ea01ceeb-48df-40d3-8cbe-a48271637e21",
+      "startTime": 17,
+      "endTime": 19,
+      "text": [
+        "287880003"
+      ]
+    }
+  ]
+}
