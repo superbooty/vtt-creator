@@ -45,6 +45,11 @@
           <span class="vid-time" v-bind:style="{left: dtPos}">{{dt}}</span>
         </div>
       </div>
+      <ul class="progress-ticks">
+        <li v-for='index in 12' :key='index' class="tick">
+          <span>{{(index - 1) * 5}}</span>
+        </li>
+      </ul>
       <div class="builder-tester" :class="{'active': cue.active, 'saved': cue.saved}"
         v-bind:style="{left: cue.leftPos}" v-for="cue in cueList" 
         :key="cue.id" @click.stop="activateCue($event, cue.id)">
@@ -430,13 +435,40 @@ export default {
   }
 }
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
   .app-body {
     margin: 8px;
+    .progress-ticks {
+      padding: 0;
+      display: flex;
+      list-style-type: none;
+      position: absolute;
+      .tick {
+        width: calc(1335px/12);
+        position: relative;
+        span {
+          position: relative;
+          top: 25px;
+          left: -5px;
+          font-size: 12px;
+        }
+        &:marker {
+          content: "|",
+        }
+        &:before {
+          background: repeating-linear-gradient(0.25turn, white, white 20%, #585858 21%, white 2px);
+          height: 6px;
+          position: absolute;
+          top: 10px;
+          width: 100%;
+          content: "|";
+        }
+      }
+    }
     .builder-tester {
       position: relative;
       font-family: Arial, Helvetica, sans-serif;
