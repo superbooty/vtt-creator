@@ -28,7 +28,6 @@
         ref="videoPlayerRef"
         class="video-el br-all pos-absolute"
         src="https://assets.contentstack.io/v3/assets/bltab687eb09ed92451/blt0516a2ddf86d32f7/60256c5f5f9b2812764c3de9/levisSeasonalSample.mp4"
-        playsinline
         crossorigin
         controls="controls"
         preload="none"
@@ -46,7 +45,7 @@
         </div>
       </div>
       <ul class="progress-ticks">
-        <li v-for='index in 12' :key='index' class="tick">
+        <li v-for='index in 12' :key='index' class="tick" :class="{'big': index % 2}">
           <span>{{(index - 1) * 5}}</span>
         </li>
       </ul>
@@ -451,16 +450,22 @@ export default {
         width: calc(1335px/12);
         position: relative;
         span {
-          position: relative;
+          position: absolute;
           top: 25px;
-          left: -5px;
+          left: -23px;
           font-size: 12px;
+          width: 50px;
+          text-align: center;
         }
-        &:marker {
-          content: "|",
+        &.big {
+          font-size: 28px;
+          line-height: 24px;
+          span {
+            top: 30px;
+          }
         }
         &:before {
-          background: repeating-linear-gradient(0.25turn, white, white 20%, #585858 21%, white 2px);
+          background: repeating-linear-gradient(0.25turn, white, white 20%, #000000 20.5%, white 2px);
           height: 6px;
           position: absolute;
           top: 10px;
