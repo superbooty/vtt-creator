@@ -197,7 +197,6 @@ export default {
     top: 0;
     height: 100%;
     width: 100%;
-    background-color: inherit;
     transform: skewX(-10deg);
   }
   &:before {
@@ -208,7 +207,6 @@ export default {
     top: 0;
     height: 100%;
     width: 100%;
-    background-color: inherit;
     transform: skewX(10deg);
   }
   .menu-expander {

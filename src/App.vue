@@ -45,7 +45,8 @@
         </div>
       </div>
       <ul class="progress-ticks">
-        <li v-for='index in 12' :key='index' class="tick" :class="{'big': index % 2}">
+        <li v-for='index in 12' :key='index' v-bind:style="{width: tickerWidth}"
+          class="tick" :class="{'big': index % 2}">
           <span>{{(index - 1) * 5}}</span>
         </li>
       </ul>
@@ -104,6 +105,11 @@ export default {
 
     const dtPos = computed(() => {
        return (playPos.value - 40) + "px";
+    })
+
+    const tickerWidth = computed(() => {
+       const w = progressRef.value;
+       return (w != null) ? (w.clientWidth + 16)/12 + "px" : "0px";
     })
 
     const cuePos = computed(() => {
@@ -187,6 +193,7 @@ export default {
 
      // hooks
     onMounted(() => {
+      console.log("WiDTH :: ", progressRef.value.offsetWidth);
       videoPlayerRef.value.load();
       videoPlayerRef.value.onloadedmetadata = function() {
           seconds.value = Math.floor(this.duration);
@@ -249,7 +256,8 @@ export default {
       previewVid,
       previewVideo,
       headerRef,
-      vttFileRef
+      vttFileRef,
+      tickerWidth
     }
   },
 
@@ -447,7 +455,7 @@ export default {
       list-style-type: none;
       position: absolute;
       .tick {
-        width: calc(1335px/12);
+        // width: calc(1335px/12);
         position: relative;
         span {
           position: absolute;
@@ -465,12 +473,15 @@ export default {
           }
         }
         &:before {
-          background: repeating-linear-gradient(0.25turn, white, white 20%, #000000 20.5%, white 2px);
-          height: 6px;
+          // background: repeating-linear-gradient(0.25turn, white, white 20%, #000000 20.5%, white 2px);
+          background-image: url(/images/tickers.png);
+          background-repeat: no-repeat;
+          height: 10px;
           position: absolute;
           top: 10px;
           width: 100%;
           content: "|";
+          background-size: 100%;
         }
       }
     }
@@ -529,6 +540,7 @@ export default {
       top: 20px;
       height: 20px;
       width: 100%;
+      min-width: 1335px;
       border-radius: 16px;
       background: #e6e6e6;
       flex-direction: row;
