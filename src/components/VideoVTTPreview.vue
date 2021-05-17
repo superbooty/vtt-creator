@@ -276,7 +276,7 @@ export default {
     max-height: 400px;
     min-width: 476px;
     justify-content: center;
-    background: black;
+    background: linear-gradient(to right, #3d3d3d, #0a0a0af2);
     // position: relative;
     // left: -340px;
     .group-scroll {
