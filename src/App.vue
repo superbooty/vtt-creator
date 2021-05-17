@@ -38,11 +38,14 @@
       >
       </video>
     </div>
+    <div class="separator"></div>
     <template v-if="!previewVid">
-      <div class="progress" ref="progressRef">
-        <div v-bind:style="{width: cuePos}" @click="addCuePointer">
-          <span class="vid-time" v-bind:style="{left: dtPos}">{{dt}}</span>
+      <div class="progress-wrapper" >
+        <div class="progress" ref="progressRef"
+          v-bind:style="{backgroundImage: gradientString}" @click.stop="addCuePointer" >
         </div>
+        <span class="vid-time" v-bind:style="{left: dtPos}"
+            @mousedown.self="startSlide">{{dt}}</span>
       </div>
       <ul class="progress-ticks">
         <li v-for='index in 12' :key='index' v-bind:style="{width: tickerWidth}"
@@ -53,7 +56,6 @@
       <div class="builder-tester" :class="{'active': cue.active, 'saved': cue.saved}"
         v-bind:style="{left: cue.leftPos}" v-for="cue in cueList" 
         :key="cue.id" @click.stop="activateCue($event, cue.id)">
-        <span v-if="cue.active" >{{cue.startTime}} secs</span>
         <button class="cue-creator" :class="{'active': cue.active, 'saved': cue.saved}"></button>
         <cue-builder :cue="cue" v-if="cue.active" @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
       </div>
@@ -86,7 +88,6 @@ export default {
     const progressRef = ref(null);
     const headerRef = ref(null);
     const showCueBuilder = ref(true);
-    const test = ref(null);
     const cueList = ref([])
     const seconds = ref(0);
     const currentPlayTime = ref(0);
@@ -95,6 +96,9 @@ export default {
     const previewVid = ref(false);
     const vttFileRef = ref(null);
     const scale = ref(1);
+    const tickerWidth = ref(null);
+    const sliding = ref(false);
+    const preSlideDelta = ref (0);
 
     const {stringifyVTT, uploadVTT, getVTTObj} = appState();
 
@@ -104,19 +108,41 @@ export default {
     })
 
     const dtPos = computed(() => {
-       return (playPos.value - 40) + "px";
-    })
-
-    const tickerWidth = computed(() => {
-       const w = progressRef.value;
-       return (w != null) ? (w.clientWidth + 16)/12 + "px" : "0px";
+       return (playPos.value - 19) + "px";
     })
 
     const cuePos = computed(() => {
        return playPos.value + "px";
     })
 
+    const gradientString = computed(() => {
+      return `linear-gradient(to right, #4e92f7 ${cuePos.value} , #e6e6e6 0px)`;
+    })
+
     // methods
+    const startSlide = (e) => {
+      videoPlayerRef.value.pause();
+      sliding.value = true;
+      preSlideDelta.value = e.pageX - playPos.value;
+      window.addEventListener("mousemove", slideMe);
+      window.addEventListener("mouseup", function mousey() {
+        if (sliding.value) {
+          sliding.value = false;
+          videoPlayerRef.value.currentTime = playPos.value/scale.value;
+          window.removeEventListener("mousemove", slideMe);
+          window.removeEventListener("mouseup", mousey);
+        }
+      });
+    }
+
+    const slideMe = (e) => {
+      e.preventDefault();
+      if (sliding.value) {
+        playPos.value = e.pageX - preSlideDelta.value;
+        currentPlayTime.value = Math.floor(playPos.value / scale.value);
+      }
+    }
+
     const activateCue = (e, id) => {
       // only one cue can be active
       console.log("EVENT :: ", e);
@@ -197,6 +223,7 @@ export default {
       videoPlayerRef.value.load();
       videoPlayerRef.value.onloadedmetadata = function() {
           seconds.value = Math.floor(this.duration);
+          tickerWidth.value = `${progressRef.value.offsetWidth/12}px`;
           scale.value = progressRef.value.offsetWidth/seconds.value;
       };
       videoPlayerRef.value.ontimeupdate = function() {
@@ -242,7 +269,6 @@ export default {
       cuePos,
       showCueBuilder,
       activateCue,
-      test,
       cueList,
       addCuePointer,
       videoPlayerRef,
@@ -257,7 +283,10 @@ export default {
       previewVideo,
       headerRef,
       vttFileRef,
-      tickerWidth
+      tickerWidth,
+      slideMe,
+      startSlide,
+      gradientString
     }
   },
 
@@ -282,6 +311,9 @@ export default {
   font-family: arial;
   line-height: 40px;
   height: 40px;
+}
+.separator {
+  height: 20px;
 }
 .header {
   margin: 0 0 10px;
@@ -449,8 +481,12 @@ export default {
   color: #2c3e50;
   .app-body {
     margin: 8px;
+    .video-wrapper {
+      margin: 20px 0;
+    }
     .progress-ticks {
       padding: 0;
+      margin: 0;
       display: flex;
       list-style-type: none;
       position: absolute;
@@ -496,6 +532,7 @@ export default {
         height: 20px;
         box-sizing: border-box;
         z-index: 100;
+        top: -4px;
         &.active, &.saved {
           z-index: 201;
         }
@@ -507,22 +544,9 @@ export default {
           margin: 0 5px;
           position: absolute;
           left: 0px;
-          top: 2px;
+          top: -2px;
           font-size: 13px;
           z-index: 201;
-        }
-        span {
-          position: absolute;
-          left: -18px;
-          top: -20px;
-          background: green;
-          font-size: 12px;
-          font-weight: 700;
-          border: 1px solid white;
-          padding: 3px;
-          border-radius: 5px;
-          color: white;
-          white-space: nowrap;
         }
       }
       &.saved {
@@ -534,36 +558,46 @@ export default {
         }
       }
     }
-    .progress {
-      display: flex;
-      position: relative;
-      top: 20px;
-      height: 20px;
+    .progress-wrapper {
       width: 100%;
-      min-width: 1335px;
-      border-radius: 16px;
-      background: #e6e6e6;
-      flex-direction: row;
-      overflow-y: hidden;
-      div {
-        background-color: #4e92f7;
+      height: 16px;
+      .vid-time {
+        &:hover {
+          cursor:grabbing;
+        }
+        position: relative;
+        color: #4e91f7;
+        font-size: 12px;
+        font-weight: 800;
+        font-family: arial;
+        box-sizing: border-box;
+        border: 1px solid #4e91f7;
+        padding: 2px 3px;
         border-radius: 16px;
-        .vid-time {
+        top: -32px;
+        &::after {
+          content: "△";
           position: absolute;
-          color: white;
-          font-size: 12px;
-          font-weight: 800;
-          font-family: arial;
-          box-sizing: border-box;
-          border: 1px solid #000000;
-          padding: 2px 3px;
-          background: #000000;
-          border-radius: 16px;
+          top: 34px;
+          line-height: 16px;
+          left: 10px;
+          color: #4e91f7;
+          font-size: 16px;
         }
       }
-    }
-    .separator {
-      height: 500px;
+      .progress {
+        display: flex;
+        /* position: relative; */
+        /* top: 20px; */
+        height: 10px;
+        width: 100%;
+        // min-width: 1335px;
+        border-radius: 12px;
+        background: #e6e6e6;
+        background-image: linear-gradient(to right, #4e92f7 0px , #e6e6e6 0px);
+        flex-direction: row;
+        overflow-y: hidden;
+      }
     }
   }
 }
