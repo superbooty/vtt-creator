@@ -502,31 +502,28 @@ export default {
         position: relative;
         span {
           position: absolute;
-          top: 25px;
-          left: -23px;
+          top: 30px;
+          left: -25px;
           font-size: 12px;
           width: 50px;
           text-align: center;
         }
         &:before {
           // background: repeating-linear-gradient(0.25turn, white, white 20%, #000000 20.5%, white 2px);
-          background-image: url(/images/tickers.png);
+          background-image: url(/images/new-tickers.png);
+          content: "";
           background-repeat: no-repeat;
-          height: 10px;
+          height: 20px;
           position: absolute;
           top: 10px;
           left: -1px;
           width: 100%;
-          content: "|";
           background-size: 100%;
           background-position: left 2px;
         }
         &.big {
           font-size: 28px;
           line-height: 24px;
-          &:before {
-            left: -2px;
-          }
           span {
             top: 30px;
           }
