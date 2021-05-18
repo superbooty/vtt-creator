@@ -515,6 +515,7 @@ export default {
           width: 100%;
           content: "|";
           background-size: 100%;
+          background-position: left 2px;
         }
         &.big {
           font-size: 28px;
