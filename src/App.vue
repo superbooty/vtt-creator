@@ -5,7 +5,7 @@
       <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTMgNmgtMTN2LTRoMTN2NHptMCA0aC0xM3Y0aDEzdi00em0wIDhoLTEzdjRoMTN2LTR6bTMtOGw0IDUuMDc1IDQtNS4wNzVoLTh6Ii8+PC9zdmc+">
     </span>
     <span v-if="previewVid" class="preview"></span>
-    <div class="notice">Click on the blue progress bar to generate a VTT Cue as the video plays. The bar is calibrated to the length of the video</div>
+    <div class="notice">Click on the progress bar to generate a VTT Cue as the video plays. The bar is calibrated to the length of the video</div>
     <div class="legend">
       <span class="l-cue-on"></span>
       <span class="l-cue-active"></span>
@@ -231,7 +231,7 @@ export default {
       };
       videoPlayerRef.value.ontimeupdate = function() {
         let currentTime = this.currentTime;
-        playPos.value = Math.floor(currentTime * scale.value);
+        playPos.value = currentTime * scale.value;
         currentPlayTime.value = Math.floor(currentTime);
       }
       const vttFile = vttFileRef.value;
@@ -504,13 +504,6 @@ export default {
           width: 50px;
           text-align: center;
         }
-        &.big {
-          font-size: 28px;
-          line-height: 24px;
-          span {
-            top: 30px;
-          }
-        }
         &:before {
           // background: repeating-linear-gradient(0.25turn, white, white 20%, #000000 20.5%, white 2px);
           background-image: url(/images/tickers.png);
@@ -518,9 +511,20 @@ export default {
           height: 10px;
           position: absolute;
           top: 10px;
+          left: -1px;
           width: 100%;
           content: "|";
           background-size: 100%;
+        }
+        &.big {
+          font-size: 28px;
+          line-height: 24px;
+          &:before {
+            left: -2px;
+          }
+          span {
+            top: 30px;
+          }
         }
       }
     }
