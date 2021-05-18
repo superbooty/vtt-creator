@@ -111,7 +111,7 @@ export default {
     })
 
     const dtPos = computed(() => {
-       return (playPos.value - 19) + "px";
+       return (playPos.value - 20) + "px";
     })
 
     const cuePos = computed(() => {
@@ -162,7 +162,6 @@ export default {
     }
 
     const addCuePointer = (e) => {
-      scale.value = progressRef.value.offsetWidth/seconds.value;
       let cue = {};
       const generateUUID = () => {
         var d2 = (performance && performance.now && (performance.now()*1000)) || 0;//Time in microseconds since page-load or 0 if unsupported
@@ -180,7 +179,8 @@ export default {
       cue.active = false;
       cue.saved = false;
       // time of cue
-      let cueStartTime = e.pageX/scale.value;
+      let cueStartTime = (e.pageX - 10)/scale.value;
+      console.log("CUE START :: ", cueStartTime);
       cue.startTime = Math.floor(cueStartTime);
       cueList.value.push(cue);
       console.log("CUE :: ", cue);
@@ -222,16 +222,20 @@ export default {
 
      // hooks
     onMounted(() => {
-      console.log("WiDTH :: ", progressRef.value.offsetWidth);
       videoPlayerRef.value.load();
       videoPlayerRef.value.onloadedmetadata = function() {
-          seconds.value = Math.floor(this.duration);
+          seconds.value = this.duration;
+          console.log("SECS :: ", seconds.value);
+          console.log("WiDTH :: ", progressRef.value.offsetWidth);
           tickerWidth.value = `${progressRef.value.offsetWidth/12}px`;
           scale.value = progressRef.value.offsetWidth/seconds.value;
+          console.log("SCALE :: ", scale.value);
       };
       videoPlayerRef.value.ontimeupdate = function() {
         let currentTime = this.currentTime;
+        console.log("CT :: ", currentTime);
         playPos.value = currentTime * scale.value;
+        console.log("PLAY POS :: ", currentTime);
         currentPlayTime.value = Math.floor(currentTime);
       }
       const vttFile = vttFileRef.value;
@@ -574,6 +578,8 @@ export default {
           cursor:grabbing;
         }
         position: relative;
+        display: block;
+        width: 40px;
         color: #4e91f7;
         font-size: 12px;
         font-weight: 800;
@@ -588,7 +594,7 @@ export default {
           position: absolute;
           top: 34px;
           line-height: 16px;
-          left: 10px;
+          left: 11px;
           color: #4e91f7;
           font-size: 16px;
         }
