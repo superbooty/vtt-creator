@@ -43,6 +43,9 @@
       <div class="progress-wrapper" >
         <div class="progress" ref="progressRef"
           v-bind:style="{backgroundImage: gradientString}" @click.stop="addCuePointer" >
+          <span for v-for="cue in cueList" :key="cue.id" 
+            v-bind:style="{left: cue.leftPos}" class="poi">
+          </span>
         </div>
         <span class="vid-time" v-bind:style="{left: dtPos}"
             @mousedown.self="startSlide">{{dt}}</span>
@@ -116,7 +119,7 @@ export default {
     })
 
     const gradientString = computed(() => {
-      return `linear-gradient(to right, #4e92f7 ${cuePos.value} , #e6e6e6 0px)`;
+      return `linear-gradient(to right, #4e92f7 ${cuePos.value} , #b0b3b7 0px)`;
     })
 
     // methods
@@ -597,6 +600,19 @@ export default {
         background-image: linear-gradient(to right, #4e92f7 0px , #e6e6e6 0px);
         flex-direction: row;
         overflow-y: hidden;
+        .poi {
+          position: relative;
+          z-index: 0;
+          &::after {
+            position: absolute;
+            content: "⫿";
+            line-height: 12px;
+            font-size: 12px;
+            font-weight: 900;
+            color: #ffffff;
+            left: 8px;
+          }
+        }
       }
     }
   }
