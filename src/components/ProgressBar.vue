@@ -62,7 +62,8 @@ export default {
     });
 
     const thumbLabel = computed(() => {
-      return props.label != null ? props.label : Math.floor(slidePos.value/scale.value);
+      return props.label != null ? props.label
+        : formatCueTime(Math.floor(slidePos.value/scale.value));
     })
 
     const gradientString = computed(() => {
@@ -72,7 +73,8 @@ export default {
     // watchers
 
     watch(() => props.pos, () => {
-      // message from parent position has changed
+      // the slider position can be controlled by the parent if necessary
+      slidePos.value = props.pos * scale.value;
     });
 
     // methods
@@ -100,6 +102,16 @@ export default {
       }
     }
 
+    const formatCueTime = (timestamp) => {
+      var hours = Math.floor(timestamp / 60 / 60);
+      // 37
+      var minutes = Math.floor(timestamp / 60) - (hours * 60);
+      // 42
+      var seconds = timestamp % 60;
+      return minutes.toString().padStart(2, '0') + ':' +
+          seconds.toString().padStart(2, '0');
+    }
+
     const pbClickEmitter = (e) => {
       emit("progress-bar-click", {
           target: e.target, 
@@ -113,7 +125,6 @@ export default {
 
     // hooks
     onMounted(() => {
-      slidePos.value = props.pos != null ? props.pos : 0;
       scale.value = (progressRef.value.offsetWidth/props.ticks)/5
       tickerPxWidth.value = `${progressRef.value.offsetWidth/props.ticks}px`;
       console.log("TickerWidth :: ", tickerPxWidth.value, scale.value);

@@ -40,7 +40,7 @@
     </div>
     <div class="separator"></div>
     <progress-bar ref="progress2Ref" :ticks="12" 
-      @progress-bar-click="handlePBClick" @progress-bar-move="handleProgress"></progress-bar>
+      @progress-bar-click="handlePBClick" @progress-bar-move="handleProgress" :pos="currentPlayTime"></progress-bar>
     <div class="builder-tester" :class="{'active': cue.active, 'saved': cue.saved}"
       v-bind:style="{left: cue.leftPos}" v-for="cue in cueList" 
       :key="cue.id" @click.stop="activateCue($event, cue.id)">
@@ -95,9 +95,6 @@ export default {
     const {stringifyVTT, uploadVTT, getVTTObj} = appState();
 
     // computed
-    const dt = computed(() => {
-      return formatCueTime(currentPlayTime.value);
-    })
 
     const dtPos = computed(() => {
        return (playPos.value - 20) + "px";
@@ -185,16 +182,6 @@ export default {
       showMenu.value = false;
     }
 
-    const formatCueTime = (timestamp) => {
-      var hours = Math.floor(timestamp / 60 / 60);
-      // 37
-      var minutes = Math.floor(timestamp / 60) - (hours * 60);
-      // 42
-      var seconds = timestamp % 60;
-      return minutes.toString().padStart(2, '0') + ':' +
-          seconds.toString().padStart(2, '0');
-    }
-
      // hooks
     onMounted(() => {
       videoPlayerRef.value.load();
@@ -203,7 +190,7 @@ export default {
       };
       videoPlayerRef.value.ontimeupdate = function() {
         let currentTime = this.currentTime;
-        currentPlayTime.value = Math.floor(currentTime);
+        currentPlayTime.value = currentTime;
       }
       const vttFile = vttFileRef.value;
       vttFile.addEventListener('change', function() {
@@ -238,7 +225,6 @@ export default {
     });
 
     return {
-      dt,
       dtPos,
       cuePos,
       showCueBuilder,
