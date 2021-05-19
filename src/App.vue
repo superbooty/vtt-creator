@@ -43,7 +43,7 @@
       @progress-bar-click="handlePBClick" @progress-bar-move="handleProgress" :pos="currentPlayTime"></progress-bar>
     <div class="builder-tester" :class="{'active': cue.active, 'saved': cue.saved}"
       v-bind:style="{left: cue.leftPos}" v-for="cue in cueList" 
-      :key="cue.id" @click.stop="activateCue($event, cue.id)">
+      :key="cue.id" @click.stop="activateCue(cue.id)">
       <button class="cue-creator"
         :class="{'active': cue.active, 'saved': cue.saved}"></button>
       <cue-builder :cue="cue" v-if="cue.active" @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
@@ -88,7 +88,6 @@ export default {
     const showMenu = ref(false);
     const previewVid = ref(false);
     const vttFileRef = ref(null);
-    const scale = ref(1);
     const tickerWidth = ref(null);
     const progress2Ref = ref(null);
 
@@ -203,7 +202,8 @@ export default {
               vttCopy["vttCues"].forEach(vttCue => {
                 let cue = {};
                 cue.id = vttCue.id;
-                cue.leftPos = (vttCue.startTime * scale.value) + "px";
+                // use the scale value from the progressBar to generate the cue's let position
+                cue.leftPos = (vttCue.startTime * progress2Ref.value.scale) + "px";
                 cue.startTime = vttCue.startTime;
                 cue.saved = true;
                 cue.active = false;
