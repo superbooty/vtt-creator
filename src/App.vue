@@ -39,30 +39,16 @@
       </video>
     </div>
     <div class="separator"></div>
-    <template v-if="!previewVid">
-      <div class="progress-wrapper" >
-        <div class="progress" ref="progressRef"
-          v-bind:style="{backgroundImage: gradientString}" @click.stop="addCuePointer" >
-          <span for v-for="cue in cueList" :key="cue.id" 
-            v-bind:style="{left: cue.leftPos}" class="poi">
-          </span>
-        </div>
-        <span class="vid-time" v-bind:style="{left: dtPos}"
-            @mousedown.self="startSlide">{{dt}}</span>
-      </div>
-      <ul class="progress-ticks">
-        <li v-for='index in 12' :key='index' v-bind:style="{width: tickerWidth}"
-          class="tick" :class="{'big': index % 2}">
-          <span>{{(index - 1) * 5}}</span>
-        </li>
-      </ul>
-      <div class="builder-tester" :class="{'active': cue.active, 'saved': cue.saved}"
-        v-bind:style="{left: cue.leftPos}" v-for="cue in cueList" 
-        :key="cue.id" @click.stop="activateCue($event, cue.id)">
-        <button class="cue-creator" :class="{'active': cue.active, 'saved': cue.saved}"></button>
-        <cue-builder :cue="cue" v-if="cue.active" @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
-      </div>
-    </template>
+    <progress-bar ref="progress2Ref" :ticks="12" 
+      @progress-bar-click="handlePBClick" @progress-bar-move="handleProgress"></progress-bar>
+    <div class="builder-tester" :class="{'active': cue.active, 'saved': cue.saved}"
+      v-bind:style="{left: cue.leftPos}" v-for="cue in cueList" 
+      :key="cue.id" @click.stop="activateCue($event, cue.id)">
+      <button class="cue-creator"
+        :class="{'active': cue.active, 'saved': cue.saved}"></button>
+      <cue-builder :cue="cue" v-if="cue.active" @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
+    </div>
+    <div class="separator"></div>
     <div class="test-items">
       Tops: 346250001, 196980006, 197060006, 287880003, 287880004, 196950008, 197540002, 197540003
       <br>
@@ -78,6 +64,10 @@ const Preview = defineAsyncComponent(
 
 const CueBuilder = defineAsyncComponent(
   () => import("./components/VTTCueBuilder.vue")
+);
+
+const ProgressBar = defineAsyncComponent(
+  () => import("./components/ProgressBar.vue")
 );
 
 import { ref, computed, defineAsyncComponent, onMounted } from "vue";
@@ -100,8 +90,7 @@ export default {
     const vttFileRef = ref(null);
     const scale = ref(1);
     const tickerWidth = ref(null);
-    const sliding = ref(false);
-    const preSlideDelta = ref (0);
+    const progress2Ref = ref(null);
 
     const {stringifyVTT, uploadVTT, getVTTObj} = appState();
 
@@ -123,32 +112,18 @@ export default {
     })
 
     // methods
-    const startSlide = (e) => {
-      videoPlayerRef.value.pause();
-      sliding.value = true;
-      preSlideDelta.value = e.pageX - playPos.value;
-      window.addEventListener("mousemove", slideMe);
-      window.addEventListener("mouseup", function mousey() {
-        if (sliding.value) {
-          sliding.value = false;
-          videoPlayerRef.value.currentTime = playPos.value/scale.value;
-          window.removeEventListener("mousemove", slideMe);
-          window.removeEventListener("mouseup", mousey);
-        }
-      });
+
+    const handlePBClick = (e) => {
+      console.log("PB Clicked ...", e, progress2Ref.value);
+      addCuePointer(e);
     }
 
-    const slideMe = (e) => {
-      e.preventDefault();
-      if (sliding.value) {
-        playPos.value = e.pageX - preSlideDelta.value;
-        currentPlayTime.value = Math.floor(playPos.value / scale.value);
-      }
+    const handleProgress = (opts) => {
+      videoPlayerRef.value.currentTime = opts.sliderPos/opts.scale.value;
     }
 
-    const activateCue = (e, id) => {
+    const activateCue = (id) => {
       // only one cue can be active
-      console.log("EVENT :: ", e);
       cueList.value.forEach(el => {
         if (el.id !== id) {
           console.log("CUE STARTS :: ", el.startTime);
@@ -175,17 +150,17 @@ export default {
       };
       cue.id = generateUUID();
       cue.text = "";
-      cue.leftPos = (e.pageX - 18) + "px";
+      cue.leftPos = (e.pos.x - 18) + "px";
       cue.active = false;
       cue.saved = false;
       // time of cue
-      let cueStartTime = (e.pageX - 10)/scale.value;
+      let cueStartTime = (e.pos.x - 10)/e.scale.value;
       console.log("CUE START :: ", cueStartTime);
       cue.startTime = Math.floor(cueStartTime);
       cueList.value.push(cue);
       console.log("CUE :: ", cue);
       videoPlayerRef.value.pause();
-      activateCue(e, cue.id);
+      activateCue(cue.id);
     }
 
     const closeBuilder = (options) => {
@@ -225,17 +200,9 @@ export default {
       videoPlayerRef.value.load();
       videoPlayerRef.value.onloadedmetadata = function() {
           seconds.value = this.duration;
-          console.log("SECS :: ", seconds.value);
-          console.log("WiDTH :: ", progressRef.value.offsetWidth);
-          tickerWidth.value = `${progressRef.value.offsetWidth/12}px`;
-          scale.value = progressRef.value.offsetWidth/seconds.value;
-          console.log("SCALE :: ", scale.value);
       };
       videoPlayerRef.value.ontimeupdate = function() {
         let currentTime = this.currentTime;
-        console.log("CT :: ", currentTime);
-        playPos.value = currentTime * scale.value;
-        console.log("PLAY POS :: ", currentTime);
         currentPlayTime.value = Math.floor(currentTime);
       }
       const vttFile = vttFileRef.value;
@@ -282,6 +249,7 @@ export default {
       currentPlayTime,
       playPos,
       progressRef,
+      progress2Ref,
       showMenu,
       downloadToFile,
       downloadVTT,
@@ -291,15 +259,16 @@ export default {
       headerRef,
       vttFileRef,
       tickerWidth,
-      slideMe,
-      startSlide,
-      gradientString
+      gradientString,
+      handlePBClick,
+      handleProgress
     }
   },
 
   components: {
     CueBuilder,
-    Preview
+    Preview,
+    ProgressBar
   }
 }
 </script>
