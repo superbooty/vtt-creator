@@ -39,7 +39,7 @@
       </video>
     </div>
     <div class="separator"></div>
-    <progress-bar ref="progress2Ref" :ticks="12" 
+    <progress-bar ref="progress2Ref" :length="60" 
       @progress-bar-click="handlePBClick" @progress-bar-move="handleProgress" :pos="currentPlayTime"></progress-bar>
     <div class="builder-tester" :class="{'active': cue.active, 'saved': cue.saved}"
       v-bind:style="{left: cue.leftPos}" v-for="cue in cueList" 
@@ -146,17 +146,21 @@ export default {
       };
       cue.id = generateUUID();
       cue.text = "";
+      // takes into account the with of cue pointer must divide width by 1/2.
+      // since width is 20 then needs to subtract half of that to set the cue position
       cue.leftPos = (e.pos.x - 10) + "px";
       cue.active = false;
       cue.saved = false;
       // time of cue
-      let cueStartTime = (e.pos.x - 10)/e.scale.value;
+      // takes into account the margins that is why the -18
+      let cueStartTime = (e.pos.x - 18)/e.scale.value;
       console.log("CUE START :: ", cueStartTime);
       cue.startTime = Math.floor(cueStartTime);
       cueList.value.push(cue);
       console.log("CUE :: ", cue);
       videoPlayerRef.value.pause();
       activateCue(cue.id);
+      videoPlayerRef.value.currentTime = cueStartTime;
     }
 
     const closeBuilder = (options) => {

@@ -9,7 +9,7 @@
         <label class="thumb" v-bind:style="{left: thumbPos}"
             @mousedown.self="startSlide">{{thumbLabel}}</label>
       </div>
-      <ul class="progress-ticks">
+      <ul v-if="ticks" class="progress-ticks">
         <li v-for='index in ticks' :key='index' v-bind:style="{width: tickerPxWidth}"
           class="tick" :class="{'big': index % 2}">
           <span>{{(index - 1) * 5}}</span>
@@ -30,9 +30,9 @@ export default {
     pos: {
       type: Number
     },
-    ticks: {
+    length: {
       type: Number,
-      default: 15
+      default: 60
     },
     label: {
       type: String
@@ -49,13 +49,18 @@ export default {
     const progressRef = ref(null);
     const scale = ref(1);
 
-    console.log("PROPS :: ", props);
+    console.log("PROPS :: ", props.length);
 
     // computed
     const computedProgress = computed(() => {
        return slidePos.value + "px";
        // return props.pos + "px";
     });
+
+    const ticks = computed(() => {
+      console.log("... ", props.length)
+      return Math.ceil(props.length/5);
+    })
 
     const thumbPos = computed(() => {
       return slidePos.value  - 20 + "px"
@@ -125,9 +130,10 @@ export default {
 
     // hooks
     onMounted(() => {
-      scale.value = (progressRef.value.offsetWidth/props.ticks)/5
-      tickerPxWidth.value = `${progressRef.value.offsetWidth/props.ticks}px`;
-      console.log("TickerWidth :: ", tickerPxWidth.value, scale.value);
+
+      scale.value = (progressRef.value.offsetWidth/ticks.value)/5
+      tickerPxWidth.value = `${progressRef.value.offsetWidth/ticks.value}px`;
+      console.log("TickerWidth :: ", tickerPxWidth.value, scale.value, ticks.value);
     });
 
     return {
@@ -142,6 +148,7 @@ export default {
       progressRef,
       thumbLabel,
       scale,
+      ticks
     }
   }
 }
