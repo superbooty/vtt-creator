@@ -108,8 +108,7 @@ export default {
           pushCue({id: props.cue.id, 
             startTime: props.cue.startTime,
             endTime: endSecs,
-            text: productArray,
-            leftPos: props.cue.leftPos
+            text: productArray
           });
           // console.log("VTT OBJ :: ", state.value.vttObj);
           // all good close the cue

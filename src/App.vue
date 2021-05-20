@@ -146,7 +146,7 @@ export default {
       };
       cue.id = generateUUID();
       cue.text = "";
-      cue.leftPos = (e.pos.x - 18) + "px";
+      cue.leftPos = (e.pos.x - 10) + "px";
       cue.active = false;
       cue.saved = false;
       // time of cue
@@ -486,7 +486,7 @@ export default {
       }
     }
     .builder-tester {
-      position: relative;
+      position: absolute;
       font-family: Arial, Helvetica, sans-serif;
       button {
         position: absolute;
