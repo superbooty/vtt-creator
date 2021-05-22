@@ -8,19 +8,14 @@
         </div>
         <label class="thumb" v-bind:style="{left: thumbPos}"
             @mousedown.self="startSlide">{{thumbLabel}}</label>
+            <!-- canvas to hold positioned tick marks -->
+        <canvas v-if="ticks" ref="progressTickersRef" class="tickers" width="100" height="35"></canvas>
       </div>
-      <ul v-if="ticks" class="progress-ticks">
-        <li v-for='index in ticks' :key='index' v-bind:style="{width: tickerPxWidth}"
-          class="tick" :class="{'big': index % 2}">
-          <span>{{(index - 1) * 5}}</span>
-        </li>
-      </ul>
 </template>
 
 <script>
 
 import { ref, computed, watch, onMounted } from "vue";
-// import {appState} from "@/state/appState";
 
 export default {
   name: 'ProgressBar',
@@ -44,6 +39,7 @@ export default {
   setup(props, {emit}) {
     const slidePos = ref(0)
     const tickerPxWidth = ref(null);
+    const progressTickersRef = ref(null);
     const sliding = ref(false);
     const preSlideDelta = ref (0);
     const progressRef = ref(null);
@@ -128,12 +124,51 @@ export default {
         });
     }
 
+    const buildCanvasTicks = () => {
+      const image = new Image(1, 12)
+      image.src = "/images/tick.png";
+      const canvas = progressTickersRef.value;
+      const ctx = canvas.getContext("2d");
+      canvas.width = progressRef.value.offsetWidth;
+
+      console.log("CANVAS WIDTH :: ", canvas.width );
+      ctx.translate(0.5, 0.5)
+      ctx.font = "100 11px arial gray";
+      
+      const txWidth = scale.value;
+      image.onload = function() {
+        for (let i = 0, c = 0; i < ctx.canvas.width; i += txWidth, ++c) {
+          ctx.beginPath();
+            if (c === 0) {
+              ctx.fillStyle = "gray";
+              ctx.fillText(c, i + 2, 30);
+              ctx.drawImage(image, i, 0);
+            }
+            let y = 0;
+            if (c > 0 && c % 5 === 0) {
+              const width = ctx.measureText(c).width;
+              if (i + 2 < ctx.canvas.width) {
+                ctx.fillText(c, i - (width/2), 30);
+              } else {
+                ctx.fillText(c, i - (width + 2), 30);
+              }
+              ctx.drawImage(image, i - 1, y);
+            } else {
+              ctx.drawImage(image, i - 1, y - 14);
+            }
+            ctx.stroke();
+        }
+      };
+      
+    }
+
     // hooks
     onMounted(() => {
-
-      scale.value = (progressRef.value.offsetWidth/ticks.value)/5
+      progressRef.value.style.width =  `${props.length * 15}px`;
+      scale.value = (progressRef.value.offsetWidth/props.length)
       tickerPxWidth.value = `${progressRef.value.offsetWidth/ticks.value}px`;
       console.log("TickerWidth :: ", tickerPxWidth.value, scale.value, ticks.value);
+      buildCanvasTicks();
     });
 
     return {
@@ -146,6 +181,7 @@ export default {
       slideMe,
       tickerPxWidth,
       progressRef,
+      progressTickersRef,
       thumbLabel,
       scale,
       ticks
@@ -155,6 +191,9 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.tickers {
+  position: absolute;
+}
 .progress-ticks {
   padding: 0;
   margin: 0 10px;
@@ -174,7 +213,7 @@ export default {
     }
     &:before {
       // background: repeating-linear-gradient(0.25turn, white, white 20%, #000000 20.5%, white 2px);
-      background-image: url(/images/new-tickers.png);
+      background-image: url(/images/tick-marker2.png);
       content: "";
       background-repeat: no-repeat;
       height: 20px;
@@ -228,8 +267,8 @@ export default {
   .progress {
     display: flex;
     height: 10px;
-    width: 100%;
-    // min-width: 1335px;
+    // width: 100%;
+    min-width: 1280px;
     border-radius: 12px;
     background: #e6e6e6;
     background-image: linear-gradient(to right, #4e92f7 0px , #e6e6e6 0px);

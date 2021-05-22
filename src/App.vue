@@ -39,7 +39,7 @@
       </video>
     </div>
     <div class="separator"></div>
-    <progress-bar ref="progress2Ref" :length="60" 
+    <progress-bar ref="progress2Ref" :length="seconds" 
       @progress-bar-click="handlePBClick" @progress-bar-move="handleProgress" :pos="currentPlayTime"></progress-bar>
     <div class="builder-tester" :class="{'active': cue.active, 'saved': cue.saved}"
       v-bind:style="{left: cue.leftPos}" v-for="cue in cueList" 
@@ -189,7 +189,7 @@ export default {
     onMounted(() => {
       videoPlayerRef.value.load();
       videoPlayerRef.value.onloadedmetadata = function() {
-          seconds.value = this.duration;
+        seconds.value = this.duration;
       };
       videoPlayerRef.value.ontimeupdate = function() {
         let currentTime = this.currentTime;
@@ -207,7 +207,7 @@ export default {
                 let cue = {};
                 cue.id = vttCue.id;
                 // use the scale value from the progressBar to generate the cue's let position
-                cue.leftPos = (vttCue.startTime * progress2Ref.value.scale) + "px";
+                cue.leftPos = (vttCue.startTime * progress2Ref.value.scale) + 10 + "px";
                 cue.startTime = vttCue.startTime;
                 cue.saved = true;
                 cue.active = false;
