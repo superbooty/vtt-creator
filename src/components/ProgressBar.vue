@@ -81,7 +81,7 @@ export default {
     // methods
     const startSlide = (e) => {
       sliding.value = true;
-      preSlideDelta.value = e.pageX - slidePos.value;
+      preSlideDelta.value = e.clientX - slidePos.value;
       window.addEventListener("mousemove", slideMe);
       window.addEventListener("mouseup", function mousey() {
         if (sliding.value) {
@@ -99,7 +99,7 @@ export default {
     const slideMe = (e) => {
       e.preventDefault();
       if (sliding.value) {
-        slidePos.value = e.pageX - preSlideDelta.value;
+        slidePos.value = e.clientX - preSlideDelta.value;
       }
     }
 
@@ -114,11 +114,12 @@ export default {
     }
 
     const pbClickEmitter = (e) => {
+      console.log("PAGE CLICK :: ", e.clientX, e.pageX, e.screenX);
       emit("progress-bar-click", {
           target: e.target, 
           pos: {
-            x: e.pageX,
-            y: e.pageY
+            x: e.clientX ,
+            y: e.clientY
           },
           scale
         });
@@ -192,7 +193,7 @@ export default {
 
 <style scoped lang="scss">
 .tickers {
-  position: absolute;
+  position: relative;
 }
 .progress-ticks {
   padding: 0;

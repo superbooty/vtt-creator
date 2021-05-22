@@ -23,6 +23,12 @@
   <div class="app-body">
     <preview v-if="previewVid">
     </preview>
+    <div class="cue-editor">
+      <div class="builder-tester" v-for="cue in cueList" 
+        :key="cue.id" @click.stop="activateCue(cue.id)">
+        <cue-builder :cue="cue"  @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
+      </div>
+    </div>
     <div v-show="!previewVid" class="video-wrapper">
       <video
         ref="videoPlayerRef"
@@ -33,21 +39,22 @@
         preload="none"
         loop
         type="video/mp4"
-        width="500"
-        height="300" 
       >
       </video>
+      <div class="separator"></div>
+      <div class="separator"></div>
+      <progress-bar ref="progress2Ref" :length="seconds" 
+        @progress-bar-click="handlePBClick" @progress-bar-move="handleProgress" 
+          :pos="currentPlayTime"></progress-bar>
     </div>
-    <div class="separator"></div>
-    <progress-bar ref="progress2Ref" :length="seconds" 
-      @progress-bar-click="handlePBClick" @progress-bar-move="handleProgress" :pos="currentPlayTime"></progress-bar>
-    <div class="builder-tester" :class="{'active': cue.active, 'saved': cue.saved}"
+    
+    <!-- <div class="builder-tester" :class="{'active': cue.active, 'saved': cue.saved}"
       v-bind:style="{left: cue.leftPos}" v-for="cue in cueList" 
       :key="cue.id" @click.stop="activateCue(cue.id)">
       <button class="cue-creator"
         :class="{'active': cue.active, 'saved': cue.saved}"></button>
       <cue-builder :cue="cue" v-if="cue.active" @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
-    </div>
+    </div> -->
     <div class="separator"></div>
     <div class="test-items">
       Tops: 346250001, 196980006, 197060006, 287880003, 287880004, 196950008, 197540002, 197540003
@@ -447,8 +454,67 @@ export default {
   color: #2c3e50;
   .app-body {
     margin: 8px;
+    display: flex;
+    flex-direction: row;
+    .cue-editor {
+      height: 600px;
+      width: 400px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      .builder-tester {
+        // position: absolute;
+        font-family: Arial, Helvetica, sans-serif;
+        margin: 5px auto;
+        button {
+          position: absolute;
+          border: 1px solid;
+          border-radius: 20px;
+          width: 20px;
+          height: 20px;
+          box-sizing: border-box;
+          z-index: 100;
+          top: -4px;
+          &.active, &.saved {
+            z-index: 201;
+          }
+        }
+        &.active, &.saved {
+          &::after {
+            content: "✔︎";
+            color: green;
+            margin: 0 5px;
+            position: absolute;
+            left: 0px;
+            top: -2px;
+            font-size: 13px;
+            z-index: 201;
+          }
+        }
+        &.saved {
+          &::after {
+            color: #ffffff;
+          }
+          button {
+            background: green;
+          }
+        }
+      }
+    }
     .video-wrapper {
+      height: 600px;
+      max-width: 840px;
       margin: 20px 0;
+      display: flex;
+      flex-direction: column;
+      overflow-x: auto;
+      video {
+        width: 600px;
+        height: 400px;
+      }
+    }
+    .progress-scroller {
+      overflow-x: auto;
     }
     .progress-ticks {
       padding: 0;
@@ -489,99 +555,7 @@ export default {
         }
       }
     }
-    .builder-tester {
-      position: absolute;
-      font-family: Arial, Helvetica, sans-serif;
-      button {
-        position: absolute;
-        border: 1px solid;
-        border-radius: 20px;
-        width: 20px;
-        height: 20px;
-        box-sizing: border-box;
-        z-index: 100;
-        top: -4px;
-        &.active, &.saved {
-          z-index: 201;
-        }
-      }
-      &.active, &.saved {
-        &::after {
-          content: "✔︎";
-          color: green;
-          margin: 0 5px;
-          position: absolute;
-          left: 0px;
-          top: -2px;
-          font-size: 13px;
-          z-index: 201;
-        }
-      }
-      &.saved {
-        &::after {
-          color: #ffffff;
-        }
-        button {
-          background: green;
-        }
-      }
-    }
-    .progress-wrapper {
-      width: 100%;
-      height: 16px;
-      .vid-time {
-        &:hover {
-          cursor:grabbing;
-        }
-        position: relative;
-        display: block;
-        width: 40px;
-        color: #4e91f7;
-        font-size: 12px;
-        font-weight: 800;
-        font-family: arial;
-        box-sizing: border-box;
-        border: 1px solid #4e91f7;
-        padding: 2px 3px;
-        border-radius: 16px;
-        top: -32px;
-        &::after {
-          content: "△";
-          position: absolute;
-          top: 34px;
-          line-height: 16px;
-          left: 11px;
-          color: #4e91f7;
-          font-size: 16px;
-        }
-      }
-      .progress {
-        display: flex;
-        /* position: relative; */
-        /* top: 20px; */
-        height: 10px;
-        width: 100%;
-        // min-width: 1335px;
-        border-radius: 12px;
-        background: #e6e6e6;
-        background-image: linear-gradient(to right, #4e92f7 0px , #e6e6e6 0px);
-        flex-direction: row;
-        overflow-y: hidden;
-        .poi {
-          position: relative;
-          z-index: 0;
-          &::after {
-            position: absolute;
-            content: "⫿";
-            line-height: 12px;
-            font-size: 12px;
-            font-weight: 900;
-            color: #ffffff;
-            left: 8px;
-          }
-        }
-      }
-    }
+    
   }
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="vtt-inputs">
-    <div v-if="!cue.saved" class="close" @click="deleteCuePointer"></div>
+    <!-- <div v-if="!cue.saved" class="close" @click="deleteCuePointer"></div> -->
     <div class="start-time">
       <label >start time</label>
       <input
@@ -177,25 +177,25 @@ export default {
     flex-wrap: wrap;
     justify-content: space-around;
     width: 340px;
-    position: absolute;
-    top: 30px;
-    left: -10px;
+    position: relative;
+    // top: 30px;
+    // left: -10px;
     border: 1px solid #dfdfdf;
     padding: 30px 0 10px;
     border-radius: 10px;
     background: #eeeeee;
-    &::after {
-      content: '';
-      width: 0;
-      height: 0;
-      border: 10px solid transparent;
-      border-bottom-color: #eee;
-      border-top-width: 0px;
-      left: 10px;
-      top: -10px;
-      position: absolute;
-      clear: both;
-    }
+    // &::after {
+    //   content: '';
+    //   width: 0;
+    //   height: 0;
+    //   border: 10px solid transparent;
+    //   border-bottom-color: #eee;
+    //   border-top-width: 0px;
+    //   left: 10px;
+    //   top: -10px;
+    //   position: absolute;
+    //   clear: both;
+    // }
     .saved-cue {
       line-height: 32px;
       &::after {
