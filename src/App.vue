@@ -6,11 +6,6 @@
     </span>
     <span v-if="previewVid" class="preview"></span>
     <div class="notice">Click on the progress bar to generate a VTT Cue as the video plays. The bar is calibrated to the length of the video</div>
-    <div class="legend">
-      <span class="l-cue-on"></span>
-      <span class="l-cue-active"></span>
-      <span class="l-saved"></span>
-    </div>
     <ul class="menu" :class="{'off': !showMenu}">
       <li class="menu-item" @click="downloadVTT">Download VTT</li>
       <li class="menu-item" :class="{'on': previewVid}" @click="previewVideo">Preview Video with VTT</li>
@@ -24,12 +19,13 @@
     <preview v-if="previewVid">
     </preview>
     <div class="cue-editor">
+      <div class="cue-editor-title">VTT CUE POINTERS</div>
       <div class="builder-tester" v-for="cue in cueList" 
         :key="cue.id" @click.stop="activateCue(cue.id)">
         <cue-builder :cue="cue"  @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
       </div>
     </div>
-    <div v-show="!previewVid" class="video-wrapper">
+    <div v-show="!previewVid" class="video-wrapper" ref="videoWrapperRef">
       <video
         ref="videoPlayerRef"
         class="video-el br-all pos-absolute"
@@ -43,9 +39,15 @@
       </video>
       <div class="separator"></div>
       <div class="separator"></div>
-      <progress-bar ref="progress2Ref" :length="seconds" 
+      <progress-bar v-if="seconds" ref="progress2Ref" :length="seconds" 
         @progress-bar-click="handlePBClick" @progress-bar-move="handleProgress" 
           :pos="currentPlayTime"></progress-bar>
+      <div class="separator"></div>
+      <div class="test-items">
+        Tops: 346250001, 196980006, 197060006, 287880003, 287880004, 196950008, 197540002, 197540003
+        <br>
+        Bottoms: 278890002, 188810412, 188820445, 196260276, 349640112, 177800038, 188810052
+      </div>
     </div>
     
     <!-- <div class="builder-tester" :class="{'active': cue.active, 'saved': cue.saved}"
@@ -55,12 +57,6 @@
         :class="{'active': cue.active, 'saved': cue.saved}"></button>
       <cue-builder :cue="cue" v-if="cue.active" @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
     </div> -->
-    <div class="separator"></div>
-    <div class="test-items">
-      Tops: 346250001, 196980006, 197060006, 287880003, 287880004, 196950008, 197540002, 197540003
-      <br>
-      Bottoms: 278890002, 188810412, 188820445, 196260276, 349640112, 177800038, 188810052
-    </div>
   </div>
 </template>
 
@@ -97,6 +93,7 @@ export default {
     const vttFileRef = ref(null);
     const tickerWidth = ref(null);
     const progress2Ref = ref(null);
+    const videoWrapperRef = ref(null);
 
     const {stringifyVTT, uploadVTT, getVTTObj} = appState();
 
@@ -118,7 +115,12 @@ export default {
 
     const handlePBClick = (e) => {
       console.log("PB Clicked ...", e, progress2Ref.value);
-      addCuePointer(e);
+      if (e.addCue) {
+        addCuePointer(e);
+      } else {
+        const cueStartTime = (e.pos.x - 18)/e.scale.value;
+        videoPlayerRef.value.currentTime = cueStartTime;
+      }
     }
 
     const handleProgress = (opts) => {
@@ -167,7 +169,7 @@ export default {
       console.log("CUE :: ", cue);
       videoPlayerRef.value.pause();
       activateCue(cue.id);
-      videoPlayerRef.value.currentTime = cueStartTime;
+      // videoPlayerRef.value.currentTime = cueStartTime;
     }
 
     const closeBuilder = (options) => {
@@ -254,11 +256,13 @@ export default {
       previewVid,
       previewVideo,
       headerRef,
+      seconds,
       vttFileRef,
       tickerWidth,
       gradientString,
       handlePBClick,
-      handleProgress
+      handleProgress,
+      videoWrapperRef
     }
   },
 
@@ -457,15 +461,25 @@ export default {
     display: flex;
     flex-direction: row;
     .cue-editor {
-      height: 600px;
+      height: 100vh;
       width: 400px;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 0 28px 0 0;
+      .cue-editor-title {
+        background: #1d1d1d;
+        text-align: center;
+        line-height: 36px;
+        font-size: 14px;
+        font-weight: 800;
+        color: #ffffff;
+      }
       .builder-tester {
         // position: absolute;
-        font-family: Arial, Helvetica, sans-serif;
-        margin: 5px auto;
+        margin: 0 auto;
+        border-bottom: 1px solid #dfdddd;
         button {
           position: absolute;
           border: 1px solid;
@@ -504,17 +518,13 @@ export default {
     .video-wrapper {
       height: 600px;
       max-width: 840px;
-      margin: 20px 0;
       display: flex;
       flex-direction: column;
       overflow-x: auto;
       video {
         width: 600px;
-        height: 400px;
+        height: 370px;
       }
-    }
-    .progress-scroller {
-      overflow-x: auto;
     }
     .progress-ticks {
       padding: 0;

@@ -1,6 +1,6 @@
 <template>
   <div class="vtt-inputs">
-    <!-- <div v-if="!cue.saved" class="close" @click="deleteCuePointer"></div> -->
+    <div v-if="!cue.saved" class="close" @click="deleteCuePointer"></div>
     <div class="start-time">
       <label >start time</label>
       <input
@@ -40,7 +40,7 @@
       />
     </div>
     <button v-if="!cue.saved" @click="buildVTT">Save Cue</button>
-    <div v-else class="saved-cue">Already Saved</div>
+    <div v-else class="saved-cue">Saved</div>
   </div>
 </template>
 
@@ -175,29 +175,14 @@ export default {
     display: inline-flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: space-around;
-    width: 340px;
+    justify-content: space-between;
+    width: 100%;
     position: relative;
-    // top: 30px;
-    // left: -10px;
-    border: 1px solid #dfdfdf;
     padding: 30px 0 10px;
     border-radius: 10px;
-    background: #eeeeee;
-    // &::after {
-    //   content: '';
-    //   width: 0;
-    //   height: 0;
-    //   border: 10px solid transparent;
-    //   border-bottom-color: #eee;
-    //   border-top-width: 0px;
-    //   left: 10px;
-    //   top: -10px;
-    //   position: absolute;
-    //   clear: both;
-    // }
     .saved-cue {
       line-height: 32px;
+      margin: 0 auto;
       &::after {
         content: "✔︎";
         padding: 10px;
@@ -222,12 +207,11 @@ export default {
     }
     .close {
       position: absolute;
-      top: -5px;
-      right: -5px;
+      top: 0px;
+      right: 0px;
       border-radius: 18px;
       width: 18px;
       height: 18px;
-      background: #eeeeee;
     padding: 4px;
       &::after {
         content: '✖️';
@@ -237,7 +221,7 @@ export default {
     }
     button {
       width: 100%;
-      margin: 10px 10px 0;
+      margin: 10px 0;
       height: 34px;
       outline: none;
       background: #0b5dcc;
@@ -275,13 +259,13 @@ export default {
     .meta-text {
       display: flex;
       justify-content: center;
-      width: 340px;
+      width: 100%;
       margin: 0;
       label {
         left: 20px;
       }
       textarea {
-        width: 320px;
+        width: 100%;
         height: 80px;
         resize: none;
         padding: 10px 5px;
