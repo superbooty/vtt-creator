@@ -82,7 +82,7 @@ export default {
     });
 
     const thumbPos = computed(() => {
-      return slidePos.value - 20 + "px";
+      return slidePos.value - 20  < -20 ? -20 : slidePos.value - 20 + "px";
     });
 
     const thumbLabel = computed(() => {
@@ -167,7 +167,8 @@ export default {
     const slideMe = (e) => {
       e.preventDefault();
       if (sliding.value) {
-        slidePos.value = e.clientX - preSlideDelta.value;
+        const slideBy = e.clientX - preSlideDelta.value;
+        slidePos.value = slideBy > 0 ? slideBy : 0;
       }
     };
 
@@ -329,11 +330,11 @@ export default {
 
 .progress-scroller {
   height: 100%;
+  padding: 0 20px;
   overflow-x: auto;
   .progress-wrapper {
     position: relative;
     top: 28px;
-    margin: 0 10px;
     height: 106px;
     .thumb {
       &:hover {
