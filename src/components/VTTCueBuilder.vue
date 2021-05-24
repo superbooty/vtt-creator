@@ -1,6 +1,6 @@
 <template>
   <div class="vtt-inputs">
-    <div v-if="!cue.saved" class="close" @click="deleteCuePointer"></div>
+    <div class="close" @click="deleteCuePointer"></div>
     <div class="start-time">
       <label >start time</label>
       <input
