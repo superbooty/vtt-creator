@@ -22,7 +22,10 @@
       <div class="cue-editor-title">VTT CUE POINTERS</div>
       <div class="builder-tester" v-for="cue in cueList" 
         :key="cue.id" @click.stop="activateCue(cue.id)">
-        <cue-builder :cue="cue"  @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
+        <template v-if="previewVid">
+          <cue-builder v-if="cue.saved" :cue="cue"  @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
+        </template>
+        <cue-builder v-else :cue="cue"  @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
       </div>
     </div>
     <div v-show="!previewVid" class="video-wrapper" ref="videoWrapperRef">
@@ -462,7 +465,8 @@ export default {
     flex-direction: row;
     .cue-editor {
       height: 100vh;
-      width: 400px;
+      flex-basis: 25vw;
+      min-width: 300px;
       display: flex;
       flex-direction: column;
       overflow-y: auto;

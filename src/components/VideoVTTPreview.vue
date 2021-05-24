@@ -250,9 +250,9 @@ export default {
   }
   .video-container {
     flex: 0 0 auto;
-    flex-basis: 48vw;
+    flex-basis: 42vw;
     height: 400px;
-    min-width: 476px;
+    min-width: 376px;
     background: black;
     video {
       object-fit: cover;
@@ -274,7 +274,7 @@ export default {
     display: flex;
     width: 30vw;
     max-height: 400px;
-    min-width: 476px;
+    min-width: 376px;
     justify-content: center;
     background: linear-gradient(to right, #3d3d3d, #0a0a0af2);
     // position: relative;

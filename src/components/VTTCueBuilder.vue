@@ -176,7 +176,7 @@ export default {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-between;
-    width: 100%;
+    width: 300px;
     position: relative;
     padding: 30px 0 10px;
     border-radius: 10px;
@@ -243,7 +243,7 @@ export default {
       }
       input {
         line-height: 30px;
-        width: 145px;
+        width: 100px;
         font-size: 13px;
         text-indent: 5px;
         border-radius: 6px;

@@ -102,7 +102,7 @@ export default {
       () => {
         // the slider position can be controlled by the parent if necessary
         slidePos.value = props.pos * scale.value;
-        if (slidePos.value > progressWrapperRef.value.offsetWidth - 40) {
+        if (slidePos.value > progressWrapperRef.value.offsetWidth - 60) {
           nextTick(() => {
             thumbRef.value.scrollIntoView({
               behavior: "smooth"
