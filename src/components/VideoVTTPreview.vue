@@ -233,7 +233,6 @@ export default {
   flex-wrap: wrap;
   position: relative;
   max-height: 840px;
-  justify-content: center;
   .external-msg {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 20px;

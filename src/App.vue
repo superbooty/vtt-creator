@@ -466,12 +466,12 @@ export default {
     .cue-editor {
       height: 100vh;
       flex-basis: 25vw;
-      min-width: 300px;
+      min-width: 320px;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
       font-family: Arial, Helvetica, sans-serif;
-      margin: 0 28px 0 0;
+      margin: 0;
       .cue-editor-title {
         background: #1d1d1d;
         text-align: center;
