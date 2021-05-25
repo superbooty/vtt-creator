@@ -11,6 +11,11 @@
         <div>{{ product.price.formattedValue }}</div>
       </div>
     </div>
+    <div v-else>
+      <div class="details" :class="{'separator': separator}">
+        <div class="message" v-html="message"></div>
+      </div>
+    </div>
   </transition>
 </template>
 
@@ -20,6 +25,7 @@ import { ref } from "vue";
 export default {
   props: {
     code: String,
+    message: String,
     highlight: {
         type: Boolean,
         default: false,
@@ -79,6 +85,14 @@ export default {
   background: white;
 }
 
+.details {
+  font-family: Arial, Helvetica, sans-serif;
+  .message {
+    margin: 10px;
+    font-size: 13px;
+  }
+}
+
 
 .product-card {
   width: 100%;
@@ -94,7 +108,6 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
-    font-family: Arial, Helvetica, sans-serif;
     font-size: 13px;
     font-weight: 400;
     text-align: left;

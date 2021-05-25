@@ -20,12 +20,9 @@
     </preview>
     <div class="cue-editor">
       <div class="cue-editor-title">VTT CUE POINTERS</div>
-      <div class="builder-tester" v-for="cue in cueList" 
+      <div class="builder-tester" v-for="cue in previewCues" 
         :key="cue.id" @click.stop="activateCue(cue.id)">
-        <template v-if="previewVid">
-          <cue-builder v-if="cue.saved" :cue="cue"  @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
-        </template>
-        <cue-builder v-else :cue="cue"  @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
+        <cue-builder :cue="cue"  @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
       </div>
     </div>
     <div v-show="!previewVid" class="video-wrapper" ref="videoWrapperRef">
@@ -90,11 +87,9 @@ export default {
     const cueList = ref([])
     const seconds = ref(0);
     const currentPlayTime = ref(0);
-    const playPos = ref(0);
     const showMenu = ref(false);
     const previewVid = ref(false);
     const vttFileRef = ref(null);
-    const tickerWidth = ref(null);
     const progress2Ref = ref(null);
     const videoWrapperRef = ref(null);
     const vttType = ref(0);
@@ -102,17 +97,9 @@ export default {
     const {stringifyVTT, uploadVTT, getVTTObj} = appState();
 
     // computed
-
-    const dtPos = computed(() => {
-       return (playPos.value - 20) + "px";
-    })
-
-    const cuePos = computed(() => {
-       return playPos.value + "px";
-    })
-
-    const gradientString = computed(() => {
-      return `linear-gradient(to right, #4e92f7 ${cuePos.value} , #b0b3b7 0px)`;
+    const previewCues = computed(() => {
+      console.log(getVTTObj().vttCues);
+      return previewVid.value ? getVTTObj().vttCues : cueList.value;
     })
 
     // methods
@@ -243,15 +230,13 @@ export default {
     });
 
     return {
-      dtPos,
-      cuePos,
       showCueBuilder,
       activateCue,
       cueList,
       addCuePointer,
       videoPlayerRef,
       currentPlayTime,
-      playPos,
+      previewCues,
       progressRef,
       progress2Ref,
       showMenu,
@@ -263,8 +248,6 @@ export default {
       headerRef,
       seconds,
       vttFileRef,
-      tickerWidth,
-      gradientString,
       handlePBClick,
       handleProgress,
       videoWrapperRef,
@@ -531,6 +514,7 @@ export default {
       video {
         width: 600px;
         height: 370px;
+        background: black;
       }
     }
     .progress-ticks {

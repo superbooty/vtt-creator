@@ -24,13 +24,19 @@
           <li v-for="collection in productCollection"
             class="product-group" 
             :key="collection.hash">
-            <ul>
+            <ul v-if="collection.products">
               <li v-for="(code, index) in collection.products" :key="code">
                 <video-product-card
                   :code="code"
                   :ref="`vpc${code}`"
                   :separator="index > 0"
                 >
+                </video-product-card>
+              </li>
+            </ul>
+            <ul v-else>
+              <li>
+                <video-product-card :message="collection.message">
                 </video-product-card>
               </li>
             </ul>
@@ -136,7 +142,10 @@ export default {
         if (meta) {
           const data = JSON.parse(meta);
           const productsHash = md5(data.toString()).toString();
-          const productColl = {hash: productsHash, products: data};
+          const productColl = {hash: productsHash,
+            products: Array.isArray(data) ? data : null,
+            message: !Array.isArray(data) ? data : null,
+          };
           // check if the hash is in collections array
           if (!productCollection.value.some(e => e.hash === productsHash)) {
             productCollection.value.unshift(productColl);

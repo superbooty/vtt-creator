@@ -1,6 +1,15 @@
 // store/todos.js
 import {ref } from "vue";
 
+/**
+ * {id: props.cue.id, 
+    startTime: props.cue.startTime,
+    endTime: endSecs,
+    text: vttText.value,
+    saved: cue.saved,
+    type: vttType.value
+    }
+ */
 const state = ref({
     vttObj: {vttType: "metadata",
         vttCues: [],
@@ -11,6 +20,7 @@ export function appState() {
     // do the registration here
     const pushCue = (cue) => {
         state.value.vttObj.vttCues.push(cue);
+        console.log("CUE :: ", cue);
     }
     const getVTTObj = () => {
         return state.value.vttObj
@@ -19,7 +29,8 @@ export function appState() {
         state.value.vttObj = JSON.parse(fileContent);
     }
     const stringifyVTT = () => {
-        return JSON.stringify(state.value.vttObj, null, 2);
+        return JSON.stringify(state.value.vttObj, 
+            ["id", "startTime", "endTime", "text", "type"], 2);
     }   
     return {state, pushCue, stringifyVTT, getVTTObj, uploadVTT};
 }

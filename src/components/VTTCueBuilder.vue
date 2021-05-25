@@ -10,6 +10,7 @@
         :pattern="inputPattern"
         type="text"
         required
+        :readonly="cue.saved"
         placeholder="hh:mm:ss"
         @input="inputHandler"
       />
@@ -23,11 +24,12 @@
         :pattern="inputPattern"
         type="text"
         required
+        :readonly="cue.saved"
         placeholder="hh:mm:ss"
         @input="inputHandler"
       />
     </div>
-    <div class="vtt-type" @click.stop>
+    <div v-if="!cue.saved" class="vtt-type" @click.stop>
       <label><input type="radio" id="0" value="products" :name="cue.id"  v-model="vttType"
          /> Product Cue</label>
       <label><input type="radio" id="1" value="text" :name="cue.id" v-model="vttType"
@@ -41,6 +43,7 @@
         v-model="vttText"
         ref="vttTextRef"
         required
+        :readonly="cue.saved"
         placeholder="Enter list of product PC9s (e.g. 188820445,196260276,349640112)"
         @change="inputHandler"
       />
@@ -56,7 +59,7 @@ import {appState} from "@/state/appState";
 
 export default {
   props: {
-    cue: Object
+    cue: Object,
   },
 
   setup(props, {emit}) {
@@ -108,14 +111,29 @@ export default {
         return;
       }
       if (endSecs > startSecs) {
-        if (vttText.value.match("^\\d{9}(?:|,?(| )\\d{9})*$")) {
+        if (vttType.value === "products" && vttText.value.match("^\\d{9}(?:|,?(| )\\d{9})*$")) {
           const productArray = vttText.value.split(",").map(item=>item.trim());
           vttError.value = null;
           console.log('IN CUE :: ', props.cue);
           pushCue({id: props.cue.id, 
             startTime: props.cue.startTime,
             endTime: endSecs,
-            text: productArray
+            text: productArray,
+            saved: true,
+            type: vttType.value
+          });
+          // console.log("VTT OBJ :: ", state.value.vttObj);
+          // all good close the cue
+          emit("close-builder", {cue: props.cue, delete: false});
+        } else if (vttType.value === "text") {
+          vttError.value = null;
+          console.log('IN CUE :: ', props.cue);
+          pushCue({id: props.cue.id, 
+            startTime: props.cue.startTime,
+            endTime: endSecs,
+            text: vttText.value,
+            saved: true,
+            type: vttType.value
           });
           // console.log("VTT OBJ :: ", state.value.vttObj);
           // all good close the cue
@@ -226,8 +244,8 @@ export default {
     }
     .close {
       position: absolute;
-      top: 0px;
-      right: 0px;
+      top: -5px;
+      right: -10px;
       border-radius: 18px;
       width: 18px;
       height: 18px;
@@ -273,13 +291,18 @@ export default {
           font-size: 14px;
           text-align: center;
         }
+        &:read-only {
+          background: #ececec;
+          border: none;
+          border-radius: 0;
+        }
       }
     }
     .meta-text {
       display: flex;
       justify-content: center;
       width: 100%;
-      margin: 0;
+      margin: 10px 0 0;
       label {
         left: 20px;
       }
@@ -295,6 +318,11 @@ export default {
         &::placeholder {
           color: #b8b7b7;
           font-size: 14px;
+        }
+        &:read-only {
+          background: #ececec;
+          border: none;
+          border-radius: 0;
         }
       }
     }
