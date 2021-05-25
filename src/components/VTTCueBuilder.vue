@@ -28,9 +28,9 @@
       />
     </div>
     <div class="vtt-type" @click.stop>
-      <label><input type="radio" id="0" value="products" name="vtt-type"  v-model="vttType"
+      <label><input type="radio" id="0" value="products" :name="cue.id"  v-model="vttType"
          /> Product Cue</label>
-      <label><input type="radio" id="1"  value="text" name="vtt-type" v-model="vttType"
+      <label><input type="radio" id="1" value="text" :name="cue.id" v-model="vttType"
          /> Text Cue</label>
     </div>
     <div class="error" :class="{'on': vttError !== null}">{{vttError}}</div>
