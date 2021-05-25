@@ -97,6 +97,7 @@ export default {
     const tickerWidth = ref(null);
     const progress2Ref = ref(null);
     const videoWrapperRef = ref(null);
+    const vttType = ref(0);
 
     const {stringifyVTT, uploadVTT, getVTTObj} = appState();
 
@@ -233,6 +234,7 @@ export default {
       // window events
       const hr = headerRef.value;
       window.addEventListener("click", function(e) {
+        console.log(".....why");
         // close dropdown when clicked outside
         if(!hr.contains(e.target)) {
           showMenu.value = false;
@@ -265,7 +267,8 @@ export default {
       gradientString,
       handlePBClick,
       handleProgress,
-      videoWrapperRef
+      videoWrapperRef,
+      vttType
     }
   },
 

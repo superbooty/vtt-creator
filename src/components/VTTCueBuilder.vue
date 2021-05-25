@@ -27,16 +27,22 @@
         @input="inputHandler"
       />
     </div>
+    <div class="vtt-type" @click.stop>
+      <label><input type="radio" id="0" value="products" name="vtt-type"  v-model="vttType"
+         /> Product Cue</label>
+      <label><input type="radio" id="1"  value="text" name="vtt-type" v-model="vttType"
+         /> Text Cue</label>
+    </div>
     <div class="error" :class="{'on': vttError !== null}">{{vttError}}</div>
     <div class="meta-text">
-      <label >text</label>
+      <label >{{vttType}}</label>
       <textarea
         class="msg txt-input"
         v-model="vttText"
         ref="vttTextRef"
         required
         placeholder="Enter list of product PC9s (e.g. 188820445,196260276,349640112)"
-        @input="inputHandler"
+        @change="inputHandler"
       />
     </div>
     <button v-if="!cue.saved" @click="buildVTT">Save Cue</button>
@@ -65,6 +71,7 @@ export default {
     const vttEnd = ref("");
     const vttText = ref("");
     const vttError = ref(null);
+    const vttType = ref("products");
     const inputPattern = ref("(?:[01]\\d|2[0123]):(?:[012345]\\d):(?:[012345]\\d)");
 
     // methods
@@ -158,6 +165,7 @@ export default {
       inputPattern,
       vttError,
       deleteCuePointer,
+      vttType,
     };
   },
 
@@ -180,6 +188,17 @@ export default {
     position: relative;
     padding: 30px 0 10px;
     border-radius: 10px;
+    .vtt-type {
+      label {
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+      }
+      margin: 10px 0;
+      width: 100%;
+      font-size: 10px;
+      display: flex;
+      justify-content: flex-end;
+    }
     .saved-cue {
       line-height: 32px;
       margin: 0 auto;
@@ -232,7 +251,7 @@ export default {
     }
     .start-time, .end-time, .meta-text {
         position: relative;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
       label {
         position: absolute;
         top: -10px;
