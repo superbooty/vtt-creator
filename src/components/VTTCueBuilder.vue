@@ -47,6 +47,9 @@
         placeholder="Enter list of product PC9s (e.g. 188820445,196260276,349640112)"
         @change="inputHandler"
       />
+      <label class="col-msg">description</label>
+      <input v-if="vttType === 'products'" 
+        :readonly="cue.saved" type="text" v-model="colMsg" class="cue-comment" />
     </div>
     <button v-if="!cue.saved" @click="buildVTT">Save Cue</button>
     <div v-else class="saved-cue">Saved</div>
@@ -73,6 +76,7 @@ export default {
     const vttTextRef = ref(null);
     const vttEnd = ref("");
     const vttText = ref("");
+    const colMsg = ref(null);
     const vttError = ref(null);
     const vttType = ref("products");
     const inputPattern = ref("(?:[01]\\d|2[0123]):(?:[012345]\\d):(?:[012345]\\d)");
@@ -113,12 +117,16 @@ export default {
       if (endSecs > startSecs) {
         if (vttType.value === "products" && vttText.value.match("^\\d{9}(?:|,?(| )\\d{9})*$")) {
           const productArray = vttText.value.split(",").map(item=>item.trim());
+          let productCueMsg = {
+            productArray,
+            msg: colMsg.value
+          }
           vttError.value = null;
           console.log('IN CUE :: ', props.cue);
           pushCue({id: props.cue.id, 
             startTime: props.cue.startTime,
             endTime: endSecs,
-            text: productArray,
+            text: productCueMsg,
             saved: true,
             type: vttType.value
           });
@@ -128,10 +136,14 @@ export default {
         } else if (vttType.value === "text") {
           vttError.value = null;
           console.log('IN CUE :: ', props.cue);
+          let productCueMsg = {
+            productArray: null,
+            msg: vttText.value
+          }
           pushCue({id: props.cue.id, 
             startTime: props.cue.startTime,
             endTime: endSecs,
-            text: vttText.value,
+            text: productCueMsg,
             saved: true,
             type: vttType.value
           });
@@ -184,6 +196,7 @@ export default {
       vttError,
       deleteCuePointer,
       vttType,
+      colMsg
     };
   },
 
@@ -277,6 +290,9 @@ export default {
         font-size: 12px;
         background: white;
         padding: 0 5px;
+        &.col-msg {
+          top: 58px;
+        }
       }
       input {
         line-height: 30px;
@@ -291,24 +307,26 @@ export default {
           font-size: 14px;
           text-align: center;
         }
-        &:read-only {
-          background: #f3f3f3;
-          border: none;
-          border-radius: 0;
-        }
       }
     }
     .meta-text {
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      justify-content: space-between;
       width: 100%;
+      max-height: 100px;
       margin: 10px 0 0;
+      input {
+        width: unset;
+        margin-top: 5px;
+      }
       label {
         left: 20px;
+        top: -8px;
       }
       textarea {
         width: 100%;
-        height: 80px;
+        height: 60px;
         resize: none;
         padding: 10px 5px;
         border: 1px solid darkgray;
@@ -319,11 +337,13 @@ export default {
           color: #b8b7b7;
           font-size: 14px;
         }
-        &:read-only {
-          background: #f3f3f3;
-          border: none;
-          border-radius: 0;
-        }
+      }
+    }
+    input, textarea {
+      &:read-only {
+        background: #f3f3f3;
+        border: none;
+        border-radius: 0;
       }
     }
   }
