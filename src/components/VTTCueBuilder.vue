@@ -31,11 +31,14 @@
     </div>
     <div v-if="!cue.saved" class="vtt-type" @click.stop>
       <label><input type="checkbox" id="0" value="false" name="pause-vid"  v-model="pauseVid"
-         /> Pause Cue</label>
+         /> Pause on Cue</label>
       <label><input type="radio" id="0" value="products" :name="cue.id"  v-model="vttType"
          /> Product</label>
       <label><input type="radio" id="1" value="text" :name="cue.id" v-model="vttType"
          /> Text</label>
+    </div>
+    <div v-else class="vtt-type">
+      <span v-if="pauseVid">THIS CUE PAUSES THE VIDEO STREAM FOR 3 SECONDS</span>
     </div>
     <div class="error" :class="{'on': vttError !== null}">{{vttError}}</div>
     <div class="meta-text">
