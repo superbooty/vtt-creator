@@ -448,7 +448,6 @@ export default {
   text-align: center;
   color: #2c3e50;
   .app-body {
-    margin: 8px;
     display: flex;
     flex-direction: row;
     .cue-editor {
@@ -460,6 +459,8 @@ export default {
       overflow-y: auto;
       font-family: Arial, Helvetica, sans-serif;
       margin: 0;
+      border-right: 1px solid #2c3e50;
+      border-left: 1px solid #2c3e50;
       .cue-editor-title {
         background: #1d1d1d;
         text-align: center;
