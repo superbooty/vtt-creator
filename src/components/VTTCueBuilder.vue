@@ -47,9 +47,11 @@
         placeholder="Enter list of product PC9s (e.g. 188820445,196260276,349640112)"
         @change="inputHandler"
       />
+    </div>
+    <div v-if="vttType === 'products'" class="meta-text">
       <label class="col-msg">description</label>
-      <input v-if="vttType === 'products'" 
-        :readonly="cue.saved" type="text" v-model="colMsg" class="cue-comment" />
+        <input 
+          :readonly="cue.saved" type="text" v-model="colMsg" class="cue-comment" />
     </div>
     <button v-if="!cue.saved" @click="buildVTT">Save Cue</button>
     <div v-else class="saved-cue">Saved</div>
@@ -290,9 +292,6 @@ export default {
         font-size: 12px;
         background: white;
         padding: 0 5px;
-        &.col-msg {
-          top: 58px;
-        }
       }
       input {
         line-height: 30px;
