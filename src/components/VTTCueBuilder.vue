@@ -30,10 +30,12 @@
       />
     </div>
     <div v-if="!cue.saved" class="vtt-type" @click.stop>
+      <label><input type="checkbox" id="0" value="false" name="pause-vid"  v-model="pauseVid"
+         /> Pause Cue</label>
       <label><input type="radio" id="0" value="products" :name="cue.id"  v-model="vttType"
-         /> Product Cue</label>
+         /> Product</label>
       <label><input type="radio" id="1" value="text" :name="cue.id" v-model="vttType"
-         /> Text Cue</label>
+         /> Text</label>
     </div>
     <div class="error" :class="{'on': vttError !== null}">{{vttError}}</div>
     <div class="meta-text">
@@ -81,6 +83,7 @@ export default {
     const colMsg = ref(null);
     const vttError = ref(null);
     const vttType = ref("products");
+    const pauseVid = ref(false);
     const inputPattern = ref("(?:[01]\\d|2[0123]):(?:[012345]\\d):(?:[012345]\\d)");
 
     // methods
@@ -117,18 +120,20 @@ export default {
         return;
       }
       if (endSecs > startSecs) {
+        let productCue = null
         if (vttType.value === "products" && vttText.value.match("^\\d{9}(?:|,?(| )\\d{9})*$")) {
           const productArray = vttText.value.split(",").map(item=>item.trim());
-          let productCueMsg = {
+          productCue = {
             productArray,
-            msg: colMsg.value
+            msg: colMsg.value,
+            pause: pauseVid.value
           }
           vttError.value = null;
           console.log('IN CUE :: ', props.cue);
           pushCue({id: props.cue.id, 
             startTime: props.cue.startTime,
             endTime: endSecs,
-            text: productCueMsg,
+            text: productCue,
             saved: true,
             type: vttType.value
           });
@@ -138,14 +143,15 @@ export default {
         } else if (vttType.value === "text") {
           vttError.value = null;
           console.log('IN CUE :: ', props.cue);
-          let productCueMsg = {
+          productCue = {
             productArray: null,
-            msg: vttText.value
+            msg: vttText.value,
+            pause: pauseVid.value
           }
           pushCue({id: props.cue.id, 
             startTime: props.cue.startTime,
             endTime: endSecs,
-            text: productCueMsg,
+            text: productCue,
             saved: true,
             type: vttType.value
           });
@@ -198,6 +204,7 @@ export default {
       vttError,
       deleteCuePointer,
       vttType,
+      pauseVid,
       colMsg
     };
   },
@@ -230,7 +237,7 @@ export default {
       width: 100%;
       font-size: 10px;
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
     }
     .saved-cue {
       line-height: 32px;

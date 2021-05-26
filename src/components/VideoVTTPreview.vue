@@ -42,7 +42,6 @@
             <!-- only message -->
             <ul v-else>
               <li>
-                stuff
                 <video-product-card :message="collection.message">
                 </video-product-card>
               </li>
@@ -160,6 +159,12 @@ export default {
             processCodeEntries(productsHash);
             const el = shoppableList.value;
             el.scrollTop = 0;
+          }
+          if (data.pause) {
+            video.pause();
+            window.setTimeout(() => {
+              video.play();
+            }, 3000);
           }
         }
       };
