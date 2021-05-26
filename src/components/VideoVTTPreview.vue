@@ -34,7 +34,7 @@
                 </video-product-card>
               </li>
               <!-- product collection can now have a message -->
-              <li v-if="collection.message">
+              <li>
                 <video-product-card :message="collection.message">
                 </video-product-card>
               </li>
@@ -42,6 +42,7 @@
             <!-- only message -->
             <ul v-else>
               <li>
+                stuff
                 <video-product-card :message="collection.message">
                 </video-product-card>
               </li>
@@ -147,7 +148,7 @@ export default {
           .join(" ");
         if (meta) {
           const data = JSON.parse(meta);
-          const productsHash = md5(data.toString()).toString();
+          const productsHash = md5(meta).toString();
           const productColl = {hash: productsHash,
             products: Array.isArray(data.productArray) ? data.productArray : null,
             message: data.msg,
