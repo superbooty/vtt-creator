@@ -292,7 +292,7 @@ export default {
           text-align: center;
         }
         &:read-only {
-          background: #ececec;
+          background: #f3f3f3;
           border: none;
           border-radius: 0;
         }
@@ -320,7 +320,7 @@ export default {
           font-size: 14px;
         }
         &:read-only {
-          background: #ececec;
+          background: #f3f3f3;
           border: none;
           border-radius: 0;
         }
