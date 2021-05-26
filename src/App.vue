@@ -19,7 +19,8 @@
     <preview v-if="previewVid">
     </preview>
     <div class="cue-editor">
-      <div class="cue-editor-title">VTT CUE POINTERS</div>
+      <div class="cue-editor-title" v-if="!previewVid">VTT CUE POINTERS</div>
+      <div class="cue-editor-title" v-else>SCHEDULED VTT CUES</div>
       <div class="builder-tester" v-for="cue in previewCues" 
         :key="cue.id" @click.stop="activateCue(cue.id)">
         <cue-builder :cue="cue"  @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
@@ -94,7 +95,7 @@ export default {
     const videoWrapperRef = ref(null);
     const vttType = ref(0);
 
-    const {stringifyVTT, uploadVTT, getVTTObj} = appState();
+    const {stringifyVTT, uploadVTT, getVTTObj, deleteCue} = appState();
 
     // computed
     const previewCues = computed(() => {
@@ -168,6 +169,7 @@ export default {
         cueList.value = cueList.value.filter(function(item) {
             return item.id !== options.cue.id;
         })
+        deleteCue(options.cue);
       } else {
         options.cue.active = false;
         options.cue.saved = true;

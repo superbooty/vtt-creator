@@ -23,16 +23,22 @@ export function appState() {
         console.log("CUE :: ", cue);
     }
     const getVTTObj = () => {
-        return state.value.vttObj
+        return state.value.vttObj;
     }
     const uploadVTT = (fileContent) => {
         state.value.vttObj = JSON.parse(fileContent);
+    }
+    const deleteCue = (cue) => {
+        state.value.vttObj.vttCues = 
+            state.value.vttObj.vttCues.filter(function(item) {
+            return item.id !== cue.id;
+        });
     }
     const stringifyVTT = () => {
         return JSON.stringify(state.value.vttObj, 
             ["id", "startTime", "endTime", "text", "type"], 2);
     }   
-    return {state, pushCue, stringifyVTT, getVTTObj, uploadVTT};
+    return {state, pushCue, stringifyVTT, getVTTObj, uploadVTT, deleteCue};
 }
 
 export default {
