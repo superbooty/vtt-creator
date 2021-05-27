@@ -25,17 +25,17 @@
             class="product-group" 
             :key="collection.hash">
             <ul v-if="collection.products">
+              <!-- product collection can now have a message -->
+              <li v-if="collection.message">
+                <video-product-card :message="collection.message">
+                </video-product-card>
+              </li>
               <li v-for="(code, index) in collection.products" :key="code">
                 <video-product-card
                   :code="code"
                   :ref="`vpc${code}`"
                   :separator="index > 0"
                 >
-                </video-product-card>
-              </li>
-              <!-- product collection can now have a message -->
-              <li>
-                <video-product-card :message="collection.message">
                 </video-product-card>
               </li>
             </ul>
