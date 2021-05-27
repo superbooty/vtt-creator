@@ -18,7 +18,7 @@
   <div class="app-body">
     <div class="cue-editor">
       <div class="cue-editor-title" v-if="!previewVid">VTT CUE POINTERS</div>
-      <div class="cue-editor-title" v-else>SCHEDULED VTT CUES</div>
+      <div class="cue-editor-title" :class="{'preview': previewVid}" v-else>PREVIEWING VTT CUES</div>
       <div class="builder-tester" v-for="cue in cueList" 
         :key="cue.id" @click.stop="activateCue(cue.id)">
         <cue-builder :cue="cue"  @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
@@ -466,6 +466,9 @@ export default {
         font-size: 14px;
         font-weight: 800;
         color: #ffffff;
+        &.preview {
+          background: #457dff;
+        }
       }
       .builder-tester {
         // position: absolute;
