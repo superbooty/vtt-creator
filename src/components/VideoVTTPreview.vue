@@ -1,20 +1,5 @@
 <template>
   <div class="shoppable-container">
-    <div class="video-container aspect-169 pos-relative">
-      <video
-        v-if="vttTrack"
-        ref="videoPlayerRef"
-        class="video-el br-all pos-absolute"
-        playsinline
-        crossorigin
-        controls="controls"
-        preload="none"
-        loop
-        type="video/mp4"
-        src="https://assets.contentstack.io/v3/assets/bltab687eb09ed92451/blt0516a2ddf86d32f7/60256c5f5f9b2812764c3de9/levisSeasonalSample.mp4"
-      >
-      </video>
-    </div>
     <div id="shoppy" class="shoppable-products" >
       <div v-if="!productCollection" class="no-products">
         <span>This video is shoppable</span>
@@ -61,13 +46,15 @@ import md5 from 'crypto-js/md5';
 
 import { ref, onMounted, watch } from "vue";
 export default {
+  props: {
+    videoPlayerRef: Object,
+  },
+
   setup(props) {
     console.log("Item Selector PROPS :: ", props);
 
     const scrollItemToView = ref(null);
-    const videoPlayerRef = ref(null);
     const productCollection = ref([]);
-    const videoSrc = ref(null);
     const metaFileSrc = ref(null);
     const shoppableList = ref(null);
     const vttTrack = ref({});
@@ -131,7 +118,7 @@ export default {
     // watchers
 
     watch(vttTrack, () => {
-      const video = videoPlayerRef.value;
+      const video = props.videoPlayerRef;
       const {vttType, vttCues} = vttTrack.value;
       const track = video.addTextTrack(vttType);
       vttCues.forEach(cue => {
@@ -172,19 +159,16 @@ export default {
 
     // hooks
     onMounted(() => {
-      videoPlayerRef.value.load();
       vttTrack.value = getVTTObj();
     });
 
     return {
-      videoSrc,
       vttTrack,
       metaFileSrc,
       productCollection,
       codeSeen,
       scrollItemToView,
       shoppableList,
-      videoPlayerRef,
       addToBucket
     };
   },
@@ -268,28 +252,6 @@ export default {
     background: #c9f6c9;
     color: blue;
   }
-  .video-container {
-    flex: 0 0 auto;
-    flex-basis: 42vw;
-    height: 400px;
-    min-width: 376px;
-    background: black;
-    video {
-      object-fit: cover;
-      width: 100%;
-      height: 100%;
-      outline: none;
-    }
-    .poster {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 56vw;
-      height: 100%;
-      background-position: center;
-    }
-  }
   .shoppable-products {
     display: flex;
     width: 30vw;
@@ -344,9 +306,5 @@ export default {
       min-width: 100%;
     }
   }
-}
-
-.video-el {
-  width: 400px;
 }
 </style>

@@ -330,7 +330,8 @@ export default {
 
 .progress-scroller {
   height: 100%;
-  padding: 0 20px;
+  padding: 0 40px 0 20px;
+  margin: 0 20px 0 0;
   overflow-x: auto;
   .progress-wrapper {
     position: relative;

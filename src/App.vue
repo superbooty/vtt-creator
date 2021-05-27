@@ -24,20 +24,22 @@
         <cue-builder :cue="cue"  @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
       </div>
     </div>
-    <preview v-if="previewVid">
-    </preview>
-    <div v-show="!previewVid" class="video-wrapper" ref="videoWrapperRef">
-      <video
-        ref="videoPlayerRef"
-        class="video-el br-all pos-absolute"
-        src="https://assets.contentstack.io/v3/assets/bltab687eb09ed92451/blt0516a2ddf86d32f7/60256c5f5f9b2812764c3de9/levisSeasonalSample.mp4"
-        crossorigin
-        controls="controls"
-        preload="none"
-        loop
-        type="video/mp4"
-      >
-      </video>
+    <div class="video-wrapper" ref="videoWrapperRef">
+      <div class="video-previewer">
+        <video
+          ref="videoPlayerRef"
+          class="video-el br-all pos-absolute"
+          src="https://assets.contentstack.io/v3/assets/bltab687eb09ed92451/blt0516a2ddf86d32f7/60256c5f5f9b2812764c3de9/levisSeasonalSample.mp4"
+          crossorigin
+          controls="controls"
+          preload="none"
+          loop
+          type="video/mp4"
+        >
+        </video>
+        <preview v-if="previewVid" :videoPlayerRef="videoPlayerRef">
+        </preview>
+      </div>
       <div class="separator"></div>
       <div class="separator"></div>
       <progress-bar v-if="seconds" ref="progress2Ref" :length="seconds" 
@@ -50,7 +52,6 @@
         Bottoms: 278890002, 188810412, 188820445, 196260276, 349640112, 177800038, 188810052
       </div>
     </div>
-    
     <!-- <div class="builder-tester" :class="{'active': cue.active, 'saved': cue.saved}"
       v-bind:style="{left: cue.leftPos}" v-for="cue in cueList" 
       :key="cue.id" @click.stop="activateCue(cue.id)">
@@ -153,7 +154,7 @@ export default {
       let cueStartTime = (e.pos.x - 18)/e.scale.value;
       console.log("CUE START :: ", cueStartTime);
       cue.startTime = Math.floor(cueStartTime);
-      cueList.value.push(cue);
+      cueList.value.unshift(cue);
       console.log("CUE :: ", cue);
       videoPlayerRef.value.pause();
       activateCue(cue.id);
@@ -513,56 +514,59 @@ export default {
     }
     .video-wrapper {
       height: 600px;
-      max-width: 840px;
+      // max-width: 840px;
       display: flex;
       flex-direction: column;
       overflow-x: auto;
-      video {
-        width: 600px;
-        height: 370px;
-        background: black;
-      }
-    }
-    .progress-ticks {
-      padding: 0;
-      margin: 0;
-      display: flex;
-      list-style-type: none;
-      position: absolute;
-      .tick {
-        // width: calc(1335px/12);
-        position: relative;
-        span {
-          position: absolute;
-          top: 30px;
-          left: -25px;
-          font-size: 12px;
-          width: 50px;
-          text-align: center;
+      .video-previewer {
+        display: flex;
+        flex-direction: row;
+        video {
+          width: 600px;
+          height: 400px;
+          background: black;
         }
-        &:before {
-          // background: repeating-linear-gradient(0.25turn, white, white 20%, #000000 20.5%, white 2px);
-          background-image: url(/images/new-tickers.png);
-          content: "";
-          background-repeat: no-repeat;
-          height: 20px;
+        .progress-ticks {
+          padding: 0;
+          margin: 0;
+          display: flex;
+          list-style-type: none;
           position: absolute;
-          top: 10px;
-          left: -1px;
-          width: 100%;
-          background-size: 100%;
-          background-position: left 2px;
-        }
-        &.big {
-          font-size: 28px;
-          line-height: 24px;
-          span {
-            top: 30px;
+          .tick {
+            // width: calc(1335px/12);
+            position: relative;
+            span {
+              position: absolute;
+              top: 30px;
+              left: -25px;
+              font-size: 12px;
+              width: 50px;
+              text-align: center;
+            }
+            &:before {
+              // background: repeating-linear-gradient(0.25turn, white, white 20%, #000000 20.5%, white 2px);
+              background-image: url(/images/new-tickers.png);
+              content: "";
+              background-repeat: no-repeat;
+              height: 20px;
+              position: absolute;
+              top: 10px;
+              left: -1px;
+              width: 100%;
+              background-size: 100%;
+              background-position: left 2px;
+            }
+            &.big {
+              font-size: 28px;
+              line-height: 24px;
+              span {
+                top: 30px;
+              }
+            }
           }
         }
       }
     }
-    
   }
 }
 </style>
