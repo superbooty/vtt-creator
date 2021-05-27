@@ -36,7 +36,11 @@ export function appState() {
     }
     const stringifyVTT = () => {
         return JSON.stringify(state.value.vttObj, 
-            ["id", "startTime", "endTime", "text", "type"], 2);
+            ["vttType", "vttCues", 
+                "id", "startTime", 
+                "endTime", "text", 
+                "productArray", "msg",
+                "pause", "type"], 2);
     }   
     return {state, pushCue, stringifyVTT, getVTTObj, uploadVTT, deleteCue};
 }
