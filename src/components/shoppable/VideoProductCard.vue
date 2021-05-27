@@ -98,6 +98,7 @@ export default {
   width: 100%;
   display: grid;
   grid-gap: 5px;
+  font-family: Arial, Helvetica, sans-serif;
   background: white;
   grid-template-columns: 90px 1fr;
   grid-template-rows: 90px;
