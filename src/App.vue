@@ -21,7 +21,7 @@
     <div class="cue-editor">
       <div class="cue-editor-title" v-if="!previewVid">VTT CUE POINTERS</div>
       <div class="cue-editor-title" v-else>SCHEDULED VTT CUES</div>
-      <div class="builder-tester" v-for="cue in previewCues" 
+      <div class="builder-tester" v-for="cue in cueList" 
         :key="cue.id" @click.stop="activateCue(cue.id)">
         <cue-builder :cue="cue"  @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
       </div>
@@ -74,7 +74,7 @@ const ProgressBar = defineAsyncComponent(
   () => import("./components/ProgressBar.vue")
 );
 
-import { ref, computed, defineAsyncComponent, onMounted } from "vue";
+import { ref, defineAsyncComponent, onMounted } from "vue";
 import {appState} from "@/state/appState";
 import {downloadToFile} from "@/utils/FileUtils";
 
@@ -98,10 +98,6 @@ export default {
     const {stringifyVTT, uploadVTT, getVTTObj, deleteCue} = appState();
 
     // computed
-    const previewCues = computed(() => {
-      console.log(getVTTObj().vttCues);
-      return  cueList.value;
-    })
 
     // methods
 
@@ -241,7 +237,6 @@ export default {
       addCuePointer,
       videoPlayerRef,
       currentPlayTime,
-      previewCues,
       progressRef,
       progress2Ref,
       showMenu,

@@ -38,7 +38,7 @@
          /> Text</label>
     </div>
     <div v-else class="vtt-type">
-      <span v-if="pauseVid">THIS CUE PAUSES THE VIDEO STREAM FOR 3 SECONDS</span>
+      <span v-if="cue.text.pause">THIS CUE PAUSES THE VIDEO STREAM FOR 3 SECONDS</span>
     </div>
     <div class="error" :class="{'on': vttError !== null}">{{vttError}}</div>
     <div class="meta-text">
@@ -257,6 +257,10 @@ export default {
       label {
         text-transform: uppercase;
         letter-spacing: 1.2px;
+      }
+      span {
+        color: green;
+        font-weight: 700;
       }
       margin: 10px 0;
       width: 100%;
