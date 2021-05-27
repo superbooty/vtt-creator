@@ -97,6 +97,7 @@ export default {
 
     const handlePBClick = (e) => {
       console.log("PB Clicked ...", e, progress2Ref.value);
+      videoPlayerRef.value.pause();
       if (e.addCue) {
         addCuePointer(e);
       } else {
