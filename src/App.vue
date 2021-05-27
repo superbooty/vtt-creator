@@ -52,13 +52,6 @@
         Bottoms: 278890002, 188810412, 188820445, 196260276, 349640112, 177800038, 188810052
       </div>
     </div>
-    <!-- <div class="builder-tester" :class="{'active': cue.active, 'saved': cue.saved}"
-      v-bind:style="{left: cue.leftPos}" v-for="cue in cueList" 
-      :key="cue.id" @click.stop="activateCue(cue.id)">
-      <button class="cue-creator"
-        :class="{'active': cue.active, 'saved': cue.saved}"></button>
-      <cue-builder :cue="cue" v-if="cue.active" @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
-    </div> -->
   </div>
 </template>
 
