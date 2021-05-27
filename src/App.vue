@@ -100,7 +100,7 @@ export default {
     // computed
     const previewCues = computed(() => {
       console.log(getVTTObj().vttCues);
-      return previewVid.value ? getVTTObj().vttCues : cueList.value;
+      return  cueList.value;
     })
 
     // methods
@@ -204,16 +204,19 @@ export default {
               console.log("File ::", fr.result);
               uploadVTT(fr.result);
               // create the cues
-              const vttCopy = Object.assign({}, getVTTObj());
-              vttCopy["vttCues"].forEach(vttCue => {
+              // const vttCopy = Object.assign({}, getVTTObj());
+              getVTTObj().vttCues.forEach(vttCue => {
                 let cue = {};
                 cue.id = vttCue.id;
                 // use the scale value from the progressBar to generate the cue's let position
                 cue.leftPos = (vttCue.startTime * progress2Ref.value.scale) + 10 + "px";
                 cue.startTime = vttCue.startTime;
-                cue.saved = true;
                 cue.active = false;
-                cue.text = vttCue.text;
+                cue.saved = true;
+                cue.vttType = vttCue.type;
+                const {productArray, msg, pause} = vttCue.text;
+                cue.text = {msg, pause};
+                cue.text.productArray = productArray ? productArray.join() : null;
                 cueList.value.push(cue);
               })
           }

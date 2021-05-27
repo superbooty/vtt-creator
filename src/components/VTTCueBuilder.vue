@@ -75,7 +75,7 @@ export default {
   setup(props, {emit}) {
     console.log("Item Selector PROPS :: ", props);
 
-    const { pushCue, getVTTObj} = appState();
+    const { pushCue } = appState();
 
     const vttStart = ref("");
     const vttStartRef= ref(null);
@@ -187,11 +187,33 @@ export default {
       vttStart.value = formatCueTime(props.cue.startTime);
       // end time as a default is 2 seconds after star time
       vttEnd.value = formatCueTime(props.cue.startTime + 2);
-      const vttCopy = Object.assign({}, getVTTObj());
-      const savedCue = vttCopy["vttCues"].find(vttCue => {
-        return vttCue.id === props.cue.id;
-      });
-      vttText.value = savedCue ? savedCue.text : "";
+      vttType.value = props.cue.vttType;
+      switch (props.cue.vttType) {
+        case "products" : 
+          vttText.value = props.cue.text.productArray;
+          colMsg.value = props.cue.text.msg;
+          break;
+        case "text" : 
+          vttText.value = props.cue.text.msg;
+          break;
+      }
+      
+      // const vttCopy = Object.assign({}, getVTTObj());
+      // const savedCue = getVTTObj().vttCues.find(vttCue => {
+      //   return vttCue.id === props.cue.id;
+      // });
+      // console.log("VTT CUE :: ", savedCue);
+      // vttType.value = savedCue.type;
+      // pauseVid.value = savedCue.text.pause;
+      // switch (savedCue.type) {
+      //   case "products" : 
+      //     vttText.value = savedCue.text.productArray.join();
+      //     colMsg.value = savedCue.text.msg;
+      //     break;
+      //   case "text" : 
+      //     vttText.value = savedCue.text.msg;
+      //     break;
+      // }
     })
 
     return {
