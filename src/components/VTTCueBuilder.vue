@@ -54,7 +54,7 @@
       />
     </div>
     <div v-if="vttType === 'products'" class="meta-text">
-      <label class="col-msg">description</label>
+      <label class="col-msg">scene description</label>
         <input 
           :readonly="cue.saved" type="text" v-model="colMsg" class="cue-comment" />
     </div>
@@ -356,7 +356,7 @@ export default {
         margin-top: 5px;
       }
       label {
-        left: 20px;
+        left: 10px;
         top: -8px;
       }
       textarea {

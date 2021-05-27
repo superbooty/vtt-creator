@@ -16,8 +16,6 @@
     </ul>
   </section>
   <div class="app-body">
-    <preview v-if="previewVid">
-    </preview>
     <div class="cue-editor">
       <div class="cue-editor-title" v-if="!previewVid">VTT CUE POINTERS</div>
       <div class="cue-editor-title" v-else>SCHEDULED VTT CUES</div>
@@ -26,6 +24,8 @@
         <cue-builder :cue="cue"  @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
       </div>
     </div>
+    <preview v-if="previewVid">
+    </preview>
     <div v-show="!previewVid" class="video-wrapper" ref="videoWrapperRef">
       <video
         ref="videoPlayerRef"
@@ -469,8 +469,10 @@ export default {
       }
       .builder-tester {
         // position: absolute;
-        margin: 0 auto;
-        border-bottom: 1px solid #dfdddd;
+        display: flex;
+        border-bottom: 3px solid #dfdddd;
+        flex-direction: column;
+        align-items: center;
         button {
           position: absolute;
           border: 1px solid;
