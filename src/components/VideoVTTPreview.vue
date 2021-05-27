@@ -1,20 +1,5 @@
 <template>
   <div class="shoppable-container">
-    <div class="video-container aspect-169 pos-relative">
-      <video
-        v-if="vttTrack"
-        ref="videoPlayerRef"
-        class="video-el br-all pos-absolute"
-        playsinline
-        crossorigin
-        controls="controls"
-        preload="none"
-        loop
-        type="video/mp4"
-        src="https://assets.contentstack.io/v3/assets/bltab687eb09ed92451/blt0516a2ddf86d32f7/60256c5f5f9b2812764c3de9/levisSeasonalSample.mp4"
-      >
-      </video>
-    </div>
     <div id="shoppy" class="shoppable-products" >
       <div v-if="!productCollection" class="no-products">
         <span>This video is shoppable</span>
@@ -24,13 +9,25 @@
           <li v-for="collection in productCollection"
             class="product-group" 
             :key="collection.hash">
-            <ul>
+            <ul v-if="collection.products">
+              <!-- product collection can now have a message -->
+              <li v-if="collection.message">
+                <video-product-card :message="collection.message">
+                </video-product-card>
+              </li>
               <li v-for="(code, index) in collection.products" :key="code">
                 <video-product-card
                   :code="code"
                   :ref="`vpc${code}`"
                   :separator="index > 0"
                 >
+                </video-product-card>
+              </li>
+            </ul>
+            <!-- only message -->
+            <ul v-else>
+              <li>
+                <video-product-card :message="collection.message">
                 </video-product-card>
               </li>
             </ul>
@@ -49,13 +46,15 @@ import md5 from 'crypto-js/md5';
 
 import { ref, onMounted, watch } from "vue";
 export default {
+  props: {
+    videoPlayerRef: Object,
+  },
+
   setup(props) {
     console.log("Item Selector PROPS :: ", props);
 
     const scrollItemToView = ref(null);
-    const videoPlayerRef = ref(null);
     const productCollection = ref([]);
-    const videoSrc = ref(null);
     const metaFileSrc = ref(null);
     const shoppableList = ref(null);
     const vttTrack = ref({});
@@ -119,7 +118,7 @@ export default {
     // watchers
 
     watch(vttTrack, () => {
-      const video = videoPlayerRef.value;
+      const video = props.videoPlayerRef;
       const {vttType, vttCues} = vttTrack.value;
       const track = video.addTextTrack(vttType);
       vttCues.forEach(cue => {
@@ -135,8 +134,11 @@ export default {
           .join(" ");
         if (meta) {
           const data = JSON.parse(meta);
-          const productsHash = md5(data.toString()).toString();
-          const productColl = {hash: productsHash, products: data};
+          const productsHash = md5(meta).toString();
+          const productColl = {hash: productsHash,
+            products: Array.isArray(data.productArray) ? data.productArray : null,
+            message: data.msg,
+          };
           // check if the hash is in collections array
           if (!productCollection.value.some(e => e.hash === productsHash)) {
             productCollection.value.unshift(productColl);
@@ -145,25 +147,28 @@ export default {
             const el = shoppableList.value;
             el.scrollTop = 0;
           }
+          if (data.pause) {
+            video.pause();
+            window.setTimeout(() => {
+              video.play();
+            }, 3000);
+          }
         }
       };
     });
 
     // hooks
     onMounted(() => {
-      videoPlayerRef.value.load();
       vttTrack.value = getVTTObj();
     });
 
     return {
-      videoSrc,
       vttTrack,
       metaFileSrc,
       productCollection,
       codeSeen,
       scrollItemToView,
       shoppableList,
-      videoPlayerRef,
       addToBucket
     };
   },
@@ -233,7 +238,6 @@ export default {
   flex-wrap: wrap;
   position: relative;
   max-height: 840px;
-  justify-content: center;
   .external-msg {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 20px;
@@ -248,33 +252,11 @@ export default {
     background: #c9f6c9;
     color: blue;
   }
-  .video-container {
-    flex: 0 0 auto;
-    flex-basis: 48vw;
-    height: 400px;
-    min-width: 476px;
-    background: black;
-    video {
-      object-fit: cover;
-      width: 100%;
-      height: 100%;
-      outline: none;
-    }
-    .poster {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 56vw;
-      height: 100%;
-      background-position: center;
-    }
-  }
   .shoppable-products {
     display: flex;
     width: 30vw;
     max-height: 400px;
-    min-width: 476px;
+    min-width: 376px;
     justify-content: center;
     background: linear-gradient(to right, #3d3d3d, #0a0a0af2);
     // position: relative;
@@ -324,9 +306,5 @@ export default {
       min-width: 100%;
     }
   }
-}
-
-.video-el {
-  width: 400px;
 }
 </style>

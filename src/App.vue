@@ -6,11 +6,6 @@
     </span>
     <span v-if="previewVid" class="preview"></span>
     <div class="notice">Click on the progress bar to generate a VTT Cue as the video plays. The bar is calibrated to the length of the video</div>
-    <div class="legend">
-      <span class="l-cue-on"></span>
-      <span class="l-cue-active"></span>
-      <span class="l-saved"></span>
-    </div>
     <ul class="menu" :class="{'off': !showMenu}">
       <li class="menu-item" @click="downloadVTT">Download VTT</li>
       <li class="menu-item" :class="{'on': previewVid}" @click="previewVideo">Preview Video with VTT</li>
@@ -21,52 +16,41 @@
     </ul>
   </section>
   <div class="app-body">
-    <preview v-if="previewVid">
-    </preview>
-    <div v-show="!previewVid" class="video-wrapper">
-      <video
-        ref="videoPlayerRef"
-        class="video-el br-all pos-absolute"
-        src="https://assets.contentstack.io/v3/assets/bltab687eb09ed92451/blt0516a2ddf86d32f7/60256c5f5f9b2812764c3de9/levisSeasonalSample.mp4"
-        crossorigin
-        controls="controls"
-        preload="none"
-        loop
-        type="video/mp4"
-        width="500"
-        height="300" 
-      >
-      </video>
+    <div class="cue-editor">
+      <div class="cue-editor-title" v-if="!previewVid">VTT CUE POINTERS</div>
+      <div class="cue-editor-title" :class="{'preview': previewVid}" v-else>PREVIEWING VTT CUES</div>
+      <div class="builder-tester" v-for="cue in cueList" 
+        :key="cue.id" @click.stop="activateCue(cue.id)">
+        <cue-builder :cue="cue"  @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
+      </div>
     </div>
-    <div class="separator"></div>
-    <template v-if="!previewVid">
-      <div class="progress-wrapper" >
-        <div class="progress" ref="progressRef"
-          v-bind:style="{backgroundImage: gradientString}" @click.stop="addCuePointer" >
-          <span for v-for="cue in cueList" :key="cue.id" 
-            v-bind:style="{left: cue.leftPos}" class="poi">
-          </span>
-        </div>
-        <span class="vid-time" v-bind:style="{left: dtPos}"
-            @mousedown.self="startSlide">{{dt}}</span>
+    <div class="video-wrapper" ref="videoWrapperRef">
+      <div class="video-previewer">
+        <video
+          ref="videoPlayerRef"
+          class="video-el br-all pos-absolute"
+          src="https://assets.contentstack.io/v3/assets/bltab687eb09ed92451/blt0516a2ddf86d32f7/60256c5f5f9b2812764c3de9/levisSeasonalSample.mp4"
+          crossorigin
+          controls="controls"
+          preload="none"
+          loop
+          type="video/mp4"
+        >
+        </video>
+        <preview v-if="previewVid" :videoPlayerRef="videoPlayerRef">
+        </preview>
       </div>
-      <ul class="progress-ticks">
-        <li v-for='index in 12' :key='index' v-bind:style="{width: tickerWidth}"
-          class="tick" :class="{'big': index % 2}">
-          <span>{{(index - 1) * 5}}</span>
-        </li>
-      </ul>
-      <div class="builder-tester" :class="{'active': cue.active, 'saved': cue.saved}"
-        v-bind:style="{left: cue.leftPos}" v-for="cue in cueList" 
-        :key="cue.id" @click.stop="activateCue($event, cue.id)">
-        <button class="cue-creator" :class="{'active': cue.active, 'saved': cue.saved}"></button>
-        <cue-builder :cue="cue" v-if="cue.active" @click.stop.prevent @closeBuilder="closeBuilder"></cue-builder>
+      <div class="separator"></div>
+      <div class="separator"></div>
+      <progress-bar v-if="seconds" ref="progress2Ref" :length="seconds" 
+        @progress-bar-click="handlePBClick" @progress-bar-move="handleProgress" 
+          :pos="currentPlayTime"></progress-bar>
+      <div class="separator"></div>
+      <div class="test-items">
+        Tops: 346250001, 196980006, 197060006, 287880003, 287880004, 196950008, 197540002, 197540003
+        <br>
+        Bottoms: 278890002, 188810412, 188820445, 196260276, 349640112, 177800038, 188810052
       </div>
-    </template>
-    <div class="test-items">
-      Tops: 346250001, 196980006, 197060006, 287880003, 287880004, 196950008, 197540002, 197540003
-      <br>
-      Bottoms: 278890002, 188810412, 188820445, 196260276, 349640112, 177800038, 188810052
     </div>
   </div>
 </template>
@@ -80,7 +64,11 @@ const CueBuilder = defineAsyncComponent(
   () => import("./components/VTTCueBuilder.vue")
 );
 
-import { ref, computed, defineAsyncComponent, onMounted } from "vue";
+const ProgressBar = defineAsyncComponent(
+  () => import("./components/ProgressBar.vue")
+);
+
+import { ref, defineAsyncComponent, onMounted } from "vue";
 import {appState} from "@/state/appState";
 import {downloadToFile} from "@/utils/FileUtils";
 
@@ -94,61 +82,35 @@ export default {
     const cueList = ref([])
     const seconds = ref(0);
     const currentPlayTime = ref(0);
-    const playPos = ref(0);
     const showMenu = ref(false);
     const previewVid = ref(false);
     const vttFileRef = ref(null);
-    const scale = ref(1);
-    const tickerWidth = ref(null);
-    const sliding = ref(false);
-    const preSlideDelta = ref (0);
+    const progress2Ref = ref(null);
+    const videoWrapperRef = ref(null);
+    const vttType = ref(0);
 
-    const {stringifyVTT, uploadVTT, getVTTObj} = appState();
+    const {stringifyVTT, uploadVTT, getVTTObj, deleteCue} = appState();
 
     // computed
-    const dt = computed(() => {
-      return formatCueTime(currentPlayTime.value);
-    })
-
-    const dtPos = computed(() => {
-       return (playPos.value - 20) + "px";
-    })
-
-    const cuePos = computed(() => {
-       return playPos.value + "px";
-    })
-
-    const gradientString = computed(() => {
-      return `linear-gradient(to right, #4e92f7 ${cuePos.value} , #b0b3b7 0px)`;
-    })
 
     // methods
-    const startSlide = (e) => {
-      videoPlayerRef.value.pause();
-      sliding.value = true;
-      preSlideDelta.value = e.pageX - playPos.value;
-      window.addEventListener("mousemove", slideMe);
-      window.addEventListener("mouseup", function mousey() {
-        if (sliding.value) {
-          sliding.value = false;
-          videoPlayerRef.value.currentTime = playPos.value/scale.value;
-          window.removeEventListener("mousemove", slideMe);
-          window.removeEventListener("mouseup", mousey);
-        }
-      });
-    }
 
-    const slideMe = (e) => {
-      e.preventDefault();
-      if (sliding.value) {
-        playPos.value = e.pageX - preSlideDelta.value;
-        currentPlayTime.value = Math.floor(playPos.value / scale.value);
+    const handlePBClick = (e) => {
+      console.log("PB Clicked ...", e, progress2Ref.value);
+      if (e.addCue) {
+        addCuePointer(e);
+      } else {
+        const cueStartTime = (e.pos.x - 18)/e.scale.value;
+        videoPlayerRef.value.currentTime = cueStartTime;
       }
     }
 
-    const activateCue = (e, id) => {
+    const handleProgress = (opts) => {
+      videoPlayerRef.value.currentTime = opts.sliderPos/opts.scale.value;
+    }
+
+    const activateCue = (id) => {
       // only one cue can be active
-      console.log("EVENT :: ", e);
       cueList.value.forEach(el => {
         if (el.id !== id) {
           console.log("CUE STARTS :: ", el.startTime);
@@ -175,17 +137,21 @@ export default {
       };
       cue.id = generateUUID();
       cue.text = "";
-      cue.leftPos = (e.pageX - 18) + "px";
+      // takes into account the with of cue pointer must divide width by 1/2.
+      // since width is 20 then needs to subtract half of that to set the cue position
+      cue.leftPos = (e.pos.x - 10) + "px";
       cue.active = false;
       cue.saved = false;
       // time of cue
-      let cueStartTime = (e.pageX - 10)/scale.value;
+      // takes into account the margins that is why the -18
+      let cueStartTime = (e.pos.x - 18)/e.scale.value;
       console.log("CUE START :: ", cueStartTime);
       cue.startTime = Math.floor(cueStartTime);
-      cueList.value.push(cue);
+      cueList.value.unshift(cue);
       console.log("CUE :: ", cue);
       videoPlayerRef.value.pause();
-      activateCue(e, cue.id);
+      activateCue(cue.id);
+      // videoPlayerRef.value.currentTime = cueStartTime;
     }
 
     const closeBuilder = (options) => {
@@ -193,6 +159,7 @@ export default {
         cueList.value = cueList.value.filter(function(item) {
             return item.id !== options.cue.id;
         })
+        deleteCue(options.cue);
       } else {
         options.cue.active = false;
         options.cue.saved = true;
@@ -210,33 +177,15 @@ export default {
       showMenu.value = false;
     }
 
-    const formatCueTime = (timestamp) => {
-      var hours = Math.floor(timestamp / 60 / 60);
-      // 37
-      var minutes = Math.floor(timestamp / 60) - (hours * 60);
-      // 42
-      var seconds = timestamp % 60;
-      return minutes.toString().padStart(2, '0') + ':' +
-          seconds.toString().padStart(2, '0');
-    }
-
      // hooks
     onMounted(() => {
       videoPlayerRef.value.load();
       videoPlayerRef.value.onloadedmetadata = function() {
-          seconds.value = this.duration;
-          console.log("SECS :: ", seconds.value);
-          console.log("WiDTH :: ", progressRef.value.offsetWidth);
-          tickerWidth.value = `${progressRef.value.offsetWidth/12}px`;
-          scale.value = progressRef.value.offsetWidth/seconds.value;
-          console.log("SCALE :: ", scale.value);
+        seconds.value = this.duration;
       };
       videoPlayerRef.value.ontimeupdate = function() {
         let currentTime = this.currentTime;
-        console.log("CT :: ", currentTime);
-        playPos.value = currentTime * scale.value;
-        console.log("PLAY POS :: ", currentTime);
-        currentPlayTime.value = Math.floor(currentTime);
+        currentPlayTime.value = currentTime;
       }
       const vttFile = vttFileRef.value;
       vttFile.addEventListener('change', function() {
@@ -245,15 +194,19 @@ export default {
               console.log("File ::", fr.result);
               uploadVTT(fr.result);
               // create the cues
-              const vttCopy = Object.assign({}, getVTTObj());
-              vttCopy["vttCues"].forEach(vttCue => {
+              // const vttCopy = Object.assign({}, getVTTObj());
+              getVTTObj().vttCues.forEach(vttCue => {
                 let cue = {};
                 cue.id = vttCue.id;
-                cue.leftPos = (vttCue.startTime * scale.value) + "px";
+                // use the scale value from the progressBar to generate the cue's let position
+                cue.leftPos = (vttCue.startTime * progress2Ref.value.scale) + 10 + "px";
                 cue.startTime = vttCue.startTime;
-                cue.saved = true;
                 cue.active = false;
-                cue.text = vttCue.text;
+                cue.saved = true;
+                cue.vttType = vttCue.type;
+                const {productArray, msg, pause} = vttCue.text;
+                cue.text = {msg, pause};
+                cue.text.productArray = productArray ? productArray.join() : null;
                 cueList.value.push(cue);
               })
           }
@@ -263,6 +216,7 @@ export default {
       // window events
       const hr = headerRef.value;
       window.addEventListener("click", function(e) {
+        console.log(".....why");
         // close dropdown when clicked outside
         if(!hr.contains(e.target)) {
           showMenu.value = false;
@@ -271,17 +225,14 @@ export default {
     });
 
     return {
-      dt,
-      dtPos,
-      cuePos,
       showCueBuilder,
       activateCue,
       cueList,
       addCuePointer,
       videoPlayerRef,
       currentPlayTime,
-      playPos,
       progressRef,
+      progress2Ref,
       showMenu,
       downloadToFile,
       downloadVTT,
@@ -289,17 +240,19 @@ export default {
       previewVid,
       previewVideo,
       headerRef,
+      seconds,
       vttFileRef,
-      tickerWidth,
-      slideMe,
-      startSlide,
-      gradientString
+      handlePBClick,
+      handleProgress,
+      videoWrapperRef,
+      vttType
     }
   },
 
   components: {
     CueBuilder,
-    Preview
+    Preview,
+    ProgressBar
   }
 }
 </script>
@@ -487,138 +440,122 @@ export default {
   text-align: center;
   color: #2c3e50;
   .app-body {
-    margin: 8px;
-    .video-wrapper {
-      margin: 20px 0;
-    }
-    .progress-ticks {
-      padding: 0;
-      margin: 0;
+    display: flex;
+    flex-direction: row;
+    .cue-editor {
+      height: 100vh;
+      flex-basis: 25vw;
+      min-width: 320px;
       display: flex;
-      list-style-type: none;
-      position: absolute;
-      .tick {
-        // width: calc(1335px/12);
-        position: relative;
-        span {
-          position: absolute;
-          top: 30px;
-          left: -25px;
-          font-size: 12px;
-          width: 50px;
-          text-align: center;
+      flex-direction: column;
+      overflow-y: auto;
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+      border-right: 1px solid #2c3e50;
+      border-left: 1px solid #2c3e50;
+      .cue-editor-title {
+        background: #1d1d1d;
+        text-align: center;
+        line-height: 36px;
+        font-size: 14px;
+        font-weight: 800;
+        color: #ffffff;
+        &.preview {
+          background: #457dff;
         }
-        &:before {
-          // background: repeating-linear-gradient(0.25turn, white, white 20%, #000000 20.5%, white 2px);
-          background-image: url(/images/new-tickers.png);
-          content: "";
-          background-repeat: no-repeat;
+      }
+      .builder-tester {
+        // position: absolute;
+        display: flex;
+        border-bottom: 3px solid #dfdddd;
+        flex-direction: column;
+        align-items: center;
+        button {
+          position: absolute;
+          border: 1px solid;
+          border-radius: 20px;
+          width: 20px;
           height: 20px;
-          position: absolute;
-          top: 10px;
-          left: -1px;
-          width: 100%;
-          background-size: 100%;
-          background-position: left 2px;
+          box-sizing: border-box;
+          z-index: 100;
+          top: -4px;
+          &.active, &.saved {
+            z-index: 201;
+          }
         }
-        &.big {
-          font-size: 28px;
-          line-height: 24px;
-          span {
-            top: 30px;
+        &.active, &.saved {
+          &::after {
+            content: "✔︎";
+            color: green;
+            margin: 0 5px;
+            position: absolute;
+            left: 0px;
+            top: -2px;
+            font-size: 13px;
+            z-index: 201;
+          }
+        }
+        &.saved {
+          &::after {
+            color: #ffffff;
+          }
+          button {
+            background: green;
           }
         }
       }
     }
-    .builder-tester {
-      position: relative;
-      font-family: Arial, Helvetica, sans-serif;
-      button {
-        position: absolute;
-        border: 1px solid;
-        border-radius: 20px;
-        width: 20px;
-        height: 20px;
-        box-sizing: border-box;
-        z-index: 100;
-        top: -4px;
-        &.active, &.saved {
-          z-index: 201;
-        }
-      }
-      &.active, &.saved {
-        &::after {
-          content: "✔︎";
-          color: green;
-          margin: 0 5px;
-          position: absolute;
-          left: 0px;
-          top: -2px;
-          font-size: 13px;
-          z-index: 201;
-        }
-      }
-      &.saved {
-        &::after {
-          color: #ffffff;
-        }
-        button {
-          background: green;
-        }
-      }
-    }
-    .progress-wrapper {
-      width: 100%;
-      height: 16px;
-      .vid-time {
-        &:hover {
-          cursor:grabbing;
-        }
-        position: relative;
-        display: block;
-        width: 40px;
-        color: #4e91f7;
-        font-size: 12px;
-        font-weight: 800;
-        font-family: arial;
-        box-sizing: border-box;
-        border: 1px solid #4e91f7;
-        padding: 2px 3px;
-        border-radius: 16px;
-        top: -32px;
-        &::after {
-          content: "△";
-          position: absolute;
-          top: 34px;
-          line-height: 16px;
-          left: 11px;
-          color: #4e91f7;
-          font-size: 16px;
-        }
-      }
-      .progress {
+    .video-wrapper {
+      height: 600px;
+      // max-width: 840px;
+      display: flex;
+      flex-direction: column;
+      overflow-x: auto;
+      .video-previewer {
         display: flex;
-        /* position: relative; */
-        /* top: 20px; */
-        height: 10px;
-        width: 100%;
-        // min-width: 1335px;
-        border-radius: 12px;
-        background: #e6e6e6;
-        background-image: linear-gradient(to right, #4e92f7 0px , #e6e6e6 0px);
         flex-direction: row;
-        overflow-y: hidden;
-        .poi {
-          position: relative;
-          z-index: 0;
-          &::after {
-            position: absolute;
-            content: "⫿";
-            line-height: 12px;
-            font-size: 12px;
-            font-weight: 900;
-            color: #ffffff;
-            left: 8px;
+        video {
+          width: 600px;
+          height: 400px;
+          background: black;
+        }
+        .progress-ticks {
+          padding: 0;
+          margin: 0;
+          display: flex;
+          list-style-type: none;
+          position: absolute;
+          .tick {
+            // width: calc(1335px/12);
+            position: relative;
+            span {
+              position: absolute;
+              top: 30px;
+              left: -25px;
+              font-size: 12px;
+              width: 50px;
+              text-align: center;
+            }
+            &:before {
+              // background: repeating-linear-gradient(0.25turn, white, white 20%, #000000 20.5%, white 2px);
+              background-image: url(/images/new-tickers.png);
+              content: "";
+              background-repeat: no-repeat;
+              height: 20px;
+              position: absolute;
+              top: 10px;
+              left: -1px;
+              width: 100%;
+              background-size: 100%;
+              background-position: left 2px;
+            }
+            &.big {
+              font-size: 28px;
+              line-height: 24px;
+              span {
+                top: 30px;
+              }
+            }
           }
         }
       }

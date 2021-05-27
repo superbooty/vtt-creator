@@ -2,30 +2,42 @@
   "vttType": "metadata",
   "vttCues": [
     {
-      "id": "4f31dbfc-031b-4253-ebf4-bdc4d27ecd2b",
-      "startTime": 6,
-      "endTime": 8,
-      "text": [
-        "188820445",
-        "196260276",
-        "349640112"
-      ]
+      "id": "8812961f-9f47-46f3-ce82-e7c0489d330d",
+      "startTime": 5,
+      "endTime": 7,
+      "text": {
+        "productArray": null,
+        "msg": "Shinny happy people",
+        "pause": true
+      },
+      "type": "text"
     },
     {
-      "id": "e848214e-b08d-4c81-fa8c-712318345bca",
-      "startTime": 10,
-      "endTime": 12,
-      "text": [
-        "197060006"
-      ]
+      "id": "9aa14b7c-0526-42d9-c20b-d2a160517735",
+      "startTime": 9,
+      "endTime": 11,
+      "text": {
+        "productArray": [
+          "188820445",
+          "196260276",
+          "349640112",
+          "177800038"
+        ],
+        "msg": "Friends hanging out at the park with their favorite Levi gear",
+        "pause": true
+      },
+      "type": "products"
     },
     {
-      "id": "ea01ceeb-48df-40d3-8cbe-a48271637e21",
-      "startTime": 17,
-      "endTime": 19,
-      "text": [
-        "287880003"
-      ]
+      "id": "b94b3211-e241-48b7-b3c4-3083e399866e",
+      "startTime": 12,
+      "endTime": 14,
+      "text": {
+        "productArray": null,
+        "msg": "Celebration balloons for Levis 501 day.  Bring the noise",
+        "pause": false
+      },
+      "type": "text"
     }
   ]
 }

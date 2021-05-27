@@ -1,6 +1,6 @@
 <template>
   <div class="vtt-inputs">
-    <div v-if="!cue.saved" class="close" @click="deleteCuePointer"></div>
+    <div class="close" @click="deleteCuePointer"></div>
     <div class="start-time">
       <label >start time</label>
       <input
@@ -10,6 +10,7 @@
         :pattern="inputPattern"
         type="text"
         required
+        :readonly="cue.saved"
         placeholder="hh:mm:ss"
         @input="inputHandler"
       />
@@ -23,24 +24,42 @@
         :pattern="inputPattern"
         type="text"
         required
+        :readonly="cue.saved"
         placeholder="hh:mm:ss"
         @input="inputHandler"
       />
     </div>
+    <div v-if="!cue.saved" class="vtt-type" @click.stop>
+      <label><input type="checkbox" id="0" value="false" name="pause-vid"  v-model="pauseVid"
+         /> Pause on Cue</label>
+      <label><input type="radio" id="0" value="products" :name="cue.id"  v-model="vttType"
+         /> Product</label>
+      <label><input type="radio" id="1" value="text" :name="cue.id" v-model="vttType"
+         /> Text</label>
+    </div>
+    <div v-else class="vtt-type">
+      <span v-if="cue.text.pause">THIS CUE PAUSES THE VIDEO STREAM FOR 3 SECONDS</span>
+    </div>
     <div class="error" :class="{'on': vttError !== null}">{{vttError}}</div>
     <div class="meta-text">
-      <label >text</label>
+      <label >{{vttType}}</label>
       <textarea
         class="msg txt-input"
         v-model="vttText"
         ref="vttTextRef"
         required
+        :readonly="cue.saved"
         placeholder="Enter list of product PC9s (e.g. 188820445,196260276,349640112)"
-        @input="inputHandler"
+        @change="inputHandler"
       />
     </div>
+    <div v-if="vttType === 'products'" class="meta-text">
+      <label class="col-msg">scene description</label>
+        <input 
+          :readonly="cue.saved" type="text" v-model="colMsg" class="cue-comment" />
+    </div>
     <button v-if="!cue.saved" @click="buildVTT">Save Cue</button>
-    <div v-else class="saved-cue">Already Saved</div>
+    <div v-else class="saved-cue">Saved</div>
   </div>
 </template>
 
@@ -50,13 +69,13 @@ import {appState} from "@/state/appState";
 
 export default {
   props: {
-    cue: Object
+    cue: Object,
   },
 
   setup(props, {emit}) {
     console.log("Item Selector PROPS :: ", props);
 
-    const { pushCue, getVTTObj} = appState();
+    const { pushCue } = appState();
 
     const vttStart = ref("");
     const vttStartRef= ref(null);
@@ -64,7 +83,10 @@ export default {
     const vttTextRef = ref(null);
     const vttEnd = ref("");
     const vttText = ref("");
+    const colMsg = ref(null);
     const vttError = ref(null);
+    const vttType = ref("products");
+    const pauseVid = ref(false);
     const inputPattern = ref("(?:[01]\\d|2[0123]):(?:[012345]\\d):(?:[012345]\\d)");
 
     // methods
@@ -101,11 +123,41 @@ export default {
         return;
       }
       if (endSecs > startSecs) {
-        if (vttText.value.match("^\\d{9}(?:|,?(| )\\d{9})*$")) {
+        let productCue = null
+        if (vttType.value === "products" && vttText.value.match("^\\d{9}(?:|,?(| )\\d{9})*$")) {
           const productArray = vttText.value.split(",").map(item=>item.trim());
+          productCue = {
+            productArray,
+            msg: colMsg.value,
+            pause: pauseVid.value
+          }
           vttError.value = null;
           console.log('IN CUE :: ', props.cue);
-          pushCue({id: props.cue.id, startTime: props.cue.startTime, endTime: endSecs, text: productArray});
+          pushCue({id: props.cue.id, 
+            startTime: props.cue.startTime,
+            endTime: endSecs,
+            text: productCue,
+            saved: true,
+            type: vttType.value
+          });
+          // console.log("VTT OBJ :: ", state.value.vttObj);
+          // all good close the cue
+          emit("close-builder", {cue: props.cue, delete: false});
+        } else if (vttType.value === "text") {
+          vttError.value = null;
+          console.log('IN CUE :: ', props.cue);
+          productCue = {
+            productArray: null,
+            msg: vttText.value,
+            pause: pauseVid.value
+          }
+          pushCue({id: props.cue.id, 
+            startTime: props.cue.startTime,
+            endTime: endSecs,
+            text: productCue,
+            saved: true,
+            type: vttType.value
+          });
           // console.log("VTT OBJ :: ", state.value.vttObj);
           // all good close the cue
           emit("close-builder", {cue: props.cue, delete: false});
@@ -135,11 +187,33 @@ export default {
       vttStart.value = formatCueTime(props.cue.startTime);
       // end time as a default is 2 seconds after star time
       vttEnd.value = formatCueTime(props.cue.startTime + 2);
-      const vttCopy = Object.assign({}, getVTTObj());
-      const savedCue = vttCopy["vttCues"].find(vttCue => {
-        return vttCue.id === props.cue.id;
-      });
-      vttText.value = savedCue ? savedCue.text : "";
+      vttType.value = props.cue.vttType;
+      switch (props.cue.vttType) {
+        case "products" : 
+          vttText.value = props.cue.text.productArray;
+          colMsg.value = props.cue.text.msg;
+          break;
+        case "text" : 
+          vttText.value = props.cue.text.msg;
+          break;
+      }
+      
+      // const vttCopy = Object.assign({}, getVTTObj());
+      // const savedCue = getVTTObj().vttCues.find(vttCue => {
+      //   return vttCue.id === props.cue.id;
+      // });
+      // console.log("VTT CUE :: ", savedCue);
+      // vttType.value = savedCue.type;
+      // pauseVid.value = savedCue.text.pause;
+      // switch (savedCue.type) {
+      //   case "products" : 
+      //     vttText.value = savedCue.text.productArray.join();
+      //     colMsg.value = savedCue.text.msg;
+      //     break;
+      //   case "text" : 
+      //     vttText.value = savedCue.text.msg;
+      //     break;
+      // }
     })
 
     return {
@@ -154,6 +228,9 @@ export default {
       inputPattern,
       vttError,
       deleteCuePointer,
+      vttType,
+      pauseVid,
+      colMsg
     };
   },
 
@@ -171,29 +248,29 @@ export default {
     display: inline-flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: space-around;
-    width: 340px;
-    position: absolute;
-    top: 30px;
-    left: -10px;
-    border: 1px solid #dfdfdf;
+    justify-content: space-between;
+    width: 300px;
+    position: relative;
     padding: 30px 0 10px;
     border-radius: 10px;
-    background: #eeeeee;
-    &::after {
-      content: '';
-      width: 0;
-      height: 0;
-      border: 10px solid transparent;
-      border-bottom-color: #eee;
-      border-top-width: 0px;
-      left: 10px;
-      top: -10px;
-      position: absolute;
-      clear: both;
+    .vtt-type {
+      label {
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+      }
+      span {
+        color: green;
+        font-weight: 700;
+      }
+      margin: 10px 0;
+      width: 100%;
+      font-size: 10px;
+      display: flex;
+      justify-content: space-between;
     }
     .saved-cue {
       line-height: 32px;
+      margin: 0 auto;
       &::after {
         content: "✔︎";
         padding: 10px;
@@ -219,11 +296,10 @@ export default {
     .close {
       position: absolute;
       top: -5px;
-      right: -5px;
+      right: -10px;
       border-radius: 18px;
       width: 18px;
       height: 18px;
-      background: #eeeeee;
     padding: 4px;
       &::after {
         content: '✖️';
@@ -233,7 +309,7 @@ export default {
     }
     button {
       width: 100%;
-      margin: 10px 10px 0;
+      margin: 10px 0;
       height: 34px;
       outline: none;
       background: #0b5dcc;
@@ -244,7 +320,7 @@ export default {
     }
     .start-time, .end-time, .meta-text {
         position: relative;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
       label {
         position: absolute;
         top: -10px;
@@ -255,7 +331,7 @@ export default {
       }
       input {
         line-height: 30px;
-        width: 145px;
+        width: 100px;
         font-size: 13px;
         text-indent: 5px;
         border-radius: 6px;
@@ -270,15 +346,22 @@ export default {
     }
     .meta-text {
       display: flex;
-      justify-content: center;
-      width: 340px;
-      margin: 0;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 100%;
+      max-height: 100px;
+      margin: 10px 0 0;
+      input {
+        width: unset;
+        margin-top: 5px;
+      }
       label {
-        left: 20px;
+        left: 10px;
+        top: -8px;
       }
       textarea {
-        width: 320px;
-        height: 80px;
+        width: 100%;
+        height: 60px;
         resize: none;
         padding: 10px 5px;
         border: 1px solid darkgray;
@@ -289,6 +372,13 @@ export default {
           color: #b8b7b7;
           font-size: 14px;
         }
+      }
+    }
+    input, textarea {
+      &:read-only {
+        background: #f3f3f3;
+        border: none;
+        border-radius: 0;
       }
     }
   }
