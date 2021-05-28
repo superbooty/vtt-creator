@@ -1,14 +1,14 @@
 <template>
   <transition name="fade">
-    <div :id="data.code" v-if="data" class="product-card" :class="{'high-light': highlight}"
+    <div v-if="data" class="product-card" :class="{'high-light': highlight}"
       @click="atcProduct(data.code)">
       <div class="product-img">
-        <img :src="data.images[3].url" />
+        <img :src="data.data.product.galleryImageList.galleryImage[0].url" />
       </div>
       <div class="product-details" :class="{'separator': separator}">
-        <div class="product-name">{{ data.name }}</div>
-        <div class="color">Color: {{ data.colorName }}</div>
-        <div>{{ data.price.formattedValue }}</div>
+        <div class="product-name">{{ data.data.product.name }}</div>
+        <div class="color">Color: {{ data.data.product.colorName }}</div>
+        <div>{{ data.data.product.price.formattedValue }}</div>
       </div>
     </div>
     <div v-else>
@@ -24,7 +24,10 @@ import { ref } from "vue";
 
 export default {
   props: {
-    data: Object,
+    data: {
+      type: Object,
+      default: null
+    },
     message: String,
     highlight: {
         type: Boolean,

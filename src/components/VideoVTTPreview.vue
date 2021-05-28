@@ -9,7 +9,7 @@
           <li v-for="collection in productCollection"
             class="product-group" 
             :key="collection.hash">
-            <ul v-if="collection.products">
+            <ul v-if="collection.productData">
               <!-- product collection can now have a message -->
               <li v-if="collection.message">
                 <video-product-card :message="collection.message">
@@ -41,6 +41,7 @@
 <script>
 import VideoProductCard from "../components/shoppable/VideoProductCard.vue";
 import {appState} from "@/state/appState";
+// import {productQuery} from "@/gql/productQuery";
 
 import md5 from 'crypto-js/md5';
 
@@ -74,10 +75,30 @@ export default {
       const fetchPromises = [];
       // fetch only if there are product ids
       if (collection.products) {
+        /////// TEST MODE ////////
         collection.products.forEach ((product) => {
           const promoise = fetch(`mocks/product/${product}.json`);
           fetchPromises.push(promoise);
         })
+        /////// STAGING DATA //////
+        // collection.products.forEach ((product) => {
+        //   const promoise = fetch(`https://staging01.dtc.levi.com/nextgen-webhooks/?operationName=product&locale=US-en_US`, {
+        //       method: "POST",
+        //       headers: {
+        //           "Content-Type": "application/json",
+        //           Accept: "application/json",
+        //       },
+        //       body: JSON.stringify({
+        //           operationName: "product",
+        //           variables: {
+        //             code: product
+        //           },
+        //           query: productQuery
+        //       }),
+        //   });
+        //   fetchPromises.push(promoise);
+        // })
+        
         Promise.all(fetchPromises).then(function (responses) {
             // Get a JSON object from each of the responses
             return Promise.all(responses.map(function (response) {
