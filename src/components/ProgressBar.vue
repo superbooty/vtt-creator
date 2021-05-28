@@ -107,7 +107,7 @@ export default {
             slidePos.value > progressWrapperRef.value.offsetWidth - 60) {
             nextTick(() => {
               thumbRef.value.scrollIntoView({behavior: "smooth", 
-              block: "end", inline: "nearest"});
+              block: "nearest", inline: "nearest"});
             })
           }
         }
@@ -335,6 +335,11 @@ export default {
   padding: 0 40px 0 20px;
   margin: 0 20px 0 0;
   overflow-x: auto;
+  -ms-overflow-style: none;  /* hide sroll Edge */
+  scrollbar-width: none;  /* hide scroll Firefox */
+  &::-webkit-scrollbar {
+    display: none; /* hide scroll chrome */
+  }
   .progress-wrapper {
     position: relative;
     top: 28px;

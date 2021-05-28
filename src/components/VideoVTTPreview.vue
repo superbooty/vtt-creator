@@ -297,6 +297,11 @@ export default {
     .group-scroll {
       overflow-y: auto;
       margin: 8px 0;
+      -ms-overflow-style: none;  /* hide sroll Edge */
+      scrollbar-width: none;  /* hide scroll Firefox */
+      &::-webkit-scrollbar {
+        display: none; /* hide scroll chrome */
+      }
     }
     .product-group {
       &:nth-child(1) {
