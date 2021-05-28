@@ -357,14 +357,14 @@ export default {
       top: -32px;
       .cue-adder {
         position: absolute;
-        width: 20px;
-        height: 20px;
-        line-height: 20px;
+        width: 22px;
+        height: 22px;
+        line-height: 22px;
         background: #4e92f7;
-        border-radius: 20px;
+        border-radius: 22px;
         font-size: 18px;
         color: white;
-        left: 10px;
+        left: 8px;
         top: 50px;
         z-index: 200;
       }
