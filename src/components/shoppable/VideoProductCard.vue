@@ -1,6 +1,6 @@
 <template>
   <transition name="fade">
-    <div :id="code" v-if="data" class="product-card" :class="{'high-light': highlight}"
+    <div :id="data.code" v-if="data" class="product-card" :class="{'high-light': highlight}"
       @click="atcProduct(data.code)">
       <div class="product-img">
         <img :src="data.images[3].url" />
@@ -24,7 +24,6 @@ import { ref } from "vue";
 
 export default {
   props: {
-    code: String,
     data: Object,
     message: String,
     highlight: {
@@ -42,21 +41,10 @@ export default {
 
     const product = ref(null);
 
-    // fetch(`mocks/product/${props.code}.json`)
-    //   .then((response) => {
-    //     const jsonObj = response.json();
-    //     console.log(jsonObj);
-    //     return jsonObj;
-    //   })
-    //   .then((myJson) => {
-    //     console.log(myJson);
-    //     product.value = myJson;
-    //   });
-
-      // methods
-      const atcProduct = (code) => {
-         emit("open-modal", code);
-      }
+    // methods
+    const atcProduct = (code) => {
+        emit("open-modal", code);
+    }
 
     return {
       product,

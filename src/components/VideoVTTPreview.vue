@@ -17,7 +17,6 @@
               </li>
               <li v-for="(product, index) in collection.productData" :key="product.code">
                 <video-product-card
-                  :code="product.code"
                   :data="product"
                   :ref="`vpc${product.code}`"
                   :separator="index > 0"
