@@ -199,7 +199,24 @@ export default {
 <style scoped lang="scss">
 
 .shuffle-move {
-  transition: transform 1s;
+  transition: transform 1.2s;
+}
+
+.shuffle-enter-active,
+.shuffle-leave-active {
+  background: white;
+  transition: all .5s ease-in-out;
+  transform-origin: left top;
+  position: relative;
+  transform: scale(1);
+  max-height: 800px;
+}
+
+.shuffle-enter-from,
+.shuffle-leave-to {
+  transform: scale(0);
+  max-height: 20px;
+  background: white;
 }
 
 .admin-console {

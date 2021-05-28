@@ -1,7 +1,7 @@
 <template>
   <transition name="fade">
     <div :id="code" v-if="data" class="product-card" :class="{'high-light': highlight}"
-      @click="atcProduct(code)">
+      @click="atcProduct(data.code)">
       <div class="product-img">
         <img :src="data.images[3].url" />
       </div>
@@ -70,10 +70,9 @@ export default {
 
 .fade-enter-active,
 .fade-leave-active {
-  z-index: 1000;
   background: white;
   transition: all 1.2s ease-in-out;
-  transform-origin: left top;
+  transform-origin: left bottom;
   position: relative;
   transform: scale(1);
   max-height: 110px;
