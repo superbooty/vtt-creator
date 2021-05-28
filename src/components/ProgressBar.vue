@@ -105,9 +105,8 @@ export default {
         slidePos.value = props.pos * scale.value;
           if (slidePos.value > progressWrapperRef.value.offsetWidth - 60) {
             nextTick(() => {
-              thumbRef.value.scrollIntoView({
-                behavior: "smooth"
-              });
+              thumbRef.value.scrollIntoView({behavior: "smooth", 
+              block: "end", inline: "nearest"});
             })
           }
         }
