@@ -1,14 +1,14 @@
 <template>
   <transition name="fade">
-    <div :id="code" v-if="product" class="product-card" :class="{'high-light': highlight}"
+    <div :id="code" v-if="data" class="product-card" :class="{'high-light': highlight}"
       @click="atcProduct(code)">
       <div class="product-img">
-        <img :src="product.images[3].url" />
+        <img :src="data.images[3].url" />
       </div>
       <div class="product-details" :class="{'separator': separator}">
-        <div class="product-name">{{ product.name }}</div>
-        <div class="color">Color: {{ product.colorName }}</div>
-        <div>{{ product.price.formattedValue }}</div>
+        <div class="product-name">{{ data.name }}</div>
+        <div class="color">Color: {{ data.colorName }}</div>
+        <div>{{ data.price.formattedValue }}</div>
       </div>
     </div>
     <div v-else>
@@ -25,6 +25,7 @@ import { ref } from "vue";
 export default {
   props: {
     code: String,
+    data: Object,
     message: String,
     highlight: {
         type: Boolean,
@@ -41,16 +42,16 @@ export default {
 
     const product = ref(null);
 
-    fetch(`mocks/product/${props.code}.json`)
-      .then((response) => {
-        const jsonObj = response.json();
-        console.log(jsonObj);
-        return jsonObj;
-      })
-      .then((myJson) => {
-        console.log(myJson);
-        product.value = myJson;
-      });
+    // fetch(`mocks/product/${props.code}.json`)
+    //   .then((response) => {
+    //     const jsonObj = response.json();
+    //     console.log(jsonObj);
+    //     return jsonObj;
+    //   })
+    //   .then((myJson) => {
+    //     console.log(myJson);
+    //     product.value = myJson;
+    //   });
 
       // methods
       const atcProduct = (code) => {

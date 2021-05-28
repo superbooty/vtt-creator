@@ -15,10 +15,11 @@
                 <video-product-card :message="collection.message">
                 </video-product-card>
               </li>
-              <li v-for="(code, index) in collection.products" :key="code">
+              <li v-for="(product, index) in collection.productData" :key="product.code">
                 <video-product-card
-                  :code="code"
-                  :ref="`vpc${code}`"
+                  :code="product.code"
+                  :data="product"
+                  :ref="`vpc${product.code}`"
                   :separator="index > 0"
                 >
                 </video-product-card>
@@ -61,22 +62,7 @@ export default {
 
     const {getVTTObj} = appState();
 
-    // Promise.all([
-    //   fetch('/video-meta/meta.json')
-    //   ]).then(function (responses) {
-    //     // Get a JSON object from each of the responses
-    //     return Promise.all(responses.map(function (response) {
-    //       return response.json();
-    //     }));
-    //   }).then(function (data) {
-    //     // data is an array of the two fetches
-    //     // first is the video data
-    //     vttTrack.value = data[0];
-    //     console.log(vttTrack.value);
-    //     // const videoTrack = document.querySelector("track");
-    //   }).catch(function (error) {
-    //     console.log(error);
-    //   });
+    // 
     
     // methods
     const codeSeen = (collectionId) => {
@@ -84,6 +70,33 @@ export default {
         return el.hash === collectionId;
       });
     };
+
+    const fetchCollection = (collection) => {
+      const fetchPromises = [];
+      // fetch only if there are product ids
+      if (collection.products) {
+        collection.products.forEach ((product) => {
+          const promoise = fetch(`mocks/product/${product}.json`);
+          fetchPromises.push(promoise);
+        })
+        Promise.all(fetchPromises).then(function (responses) {
+            // Get a JSON object from each of the responses
+            return Promise.all(responses.map(function (response) {
+              return response.json();
+            }));
+          }).then(function (data) {
+            // all the data has returned find the collection and push it
+            const found = productCollection.value.find(el => {
+              return el.hash === collection.hash;
+            });
+            found.productData = data;
+            console.log("DATA :: ", data);
+            // const videoTrack = document.querySelector("track");
+          }).catch(function (error) {
+            console.log(error);
+          });
+      }
+    }
 
     const processCodeEntries = (collectionId) => {
       const found = productCollection.value.find(el => {
@@ -93,6 +106,8 @@ export default {
         return el.hash !== collectionId;
       });
       productCollection.value.unshift(found);
+      // fetch the products in the collection
+      fetchCollection(found);
  
     }
 
@@ -142,6 +157,7 @@ export default {
           // check if the hash is in collections array
           if (!productCollection.value.some(e => e.hash === productsHash)) {
             productCollection.value.unshift(productColl);
+            fetchCollection(productColl);
           } else {
             processCodeEntries(productsHash);
             const el = shoppableList.value;
